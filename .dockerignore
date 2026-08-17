@@ -1,0 +1,17 @@
+.git
+.github
+.vs
+.vscode
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/coverage
+**/TestResults
+docs
+tests
+tmp
+*.user
+*.suo
+*.tmp
+.env

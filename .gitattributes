@@ -3,6 +3,7 @@
 .gitattributes text eol=lf
 .gitignore text eol=lf
 .editorconfig text eol=lf
+.prettierrc text eol=lf
 .env.example text eol=lf
 *.cs text eol=lf
 *.csproj text eol=lf
