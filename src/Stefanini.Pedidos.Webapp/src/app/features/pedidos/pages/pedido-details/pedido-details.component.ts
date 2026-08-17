@@ -9,23 +9,25 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { finalize } from 'rxjs';
 import { LoadingComponent } from '../../../../shared/components/loading/loading.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
+import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
 import { Pedido } from '../../models/pedido.model';
 import { PedidoService } from '../../services/pedido.service';
 
 @Component({
   selector: 'app-pedido-details',
   imports: [
-    ButtonModule,
     CurrencyPipe,
     LoadingComponent,
     PageHeaderComponent,
     RouterLink,
     TagModule,
+    UiButtonComponent,
+    UiCardComponent,
   ],
   templateUrl: './pedido-details.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

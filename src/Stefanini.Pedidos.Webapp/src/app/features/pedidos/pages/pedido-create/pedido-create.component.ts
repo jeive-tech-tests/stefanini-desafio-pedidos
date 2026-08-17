@@ -7,20 +7,21 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { LoadingComponent } from '../../../../shared/components/loading/loading.component';
-import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { UiModalComponent } from '../../../../shared/components/ui-modal/ui-modal.component';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { PedidoFormComponent } from '../../components/pedido-form/pedido-form.component';
 import { CreatePedido } from '../../models/create-pedido.model';
 import { Produto } from '../../models/produto.model';
 import { PedidoService } from '../../services/pedido.service';
 import { ProdutoService } from '../../services/produto.service';
+import { PedidoListComponent } from '../pedido-list/pedido-list.component';
 
 @Component({
   selector: 'app-pedido-create',
-  imports: [LoadingComponent, PageHeaderComponent, PedidoFormComponent, RouterLink],
+  imports: [LoadingComponent, PedidoFormComponent, PedidoListComponent, UiModalComponent],
   templateUrl: './pedido-create.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

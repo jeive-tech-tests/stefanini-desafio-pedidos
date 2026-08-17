@@ -1,10 +1,10 @@
 import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { Produto } from '../../models/produto.model';
+import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 
 export type PedidoItemFormGroup = FormGroup<{
   idProduto: FormControl<number | null>;
@@ -26,7 +26,7 @@ export function createPedidoItemForm(
 
 @Component({
   selector: 'app-pedido-item-form',
-  imports: [ButtonModule, CurrencyPipe, InputNumberModule, ReactiveFormsModule, SelectModule],
+  imports: [CurrencyPipe, InputNumberModule, ReactiveFormsModule, SelectModule, UiButtonComponent],
   templateUrl: './pedido-item-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

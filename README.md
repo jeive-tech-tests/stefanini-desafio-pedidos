@@ -49,13 +49,13 @@ As dependências apontam para o centro da aplicação:
 - **Api** expõe endpoints REST, Swagger e tratamento global de erros;
 - **Webapp** entrega a experiência de listagem e manutenção dos pedidos com organização feature-first.
 
-No Angular, `core` concentra configuração transversal, interceptadores e notificações; `layout` contém o shell visual; `shared` reúne somente componentes realmente reutilizáveis; e `features/pedidos` mantém páginas, componentes, modelos e serviços do domínio de pedidos próximos entre si. As rotas da feature são carregadas sob demanda, e criação e edição compartilham o mesmo formulário reativo com `FormArray` para os itens.
+No Angular, `core` concentra configuração transversal, interceptadores e notificações; `layout` contém o shell visual; `shared` reúne o design system reutilizável; e `features/pedidos` mantém páginas, componentes, modelos e serviços do domínio de pedidos próximos entre si. As rotas da feature são carregadas sob demanda, e criação e edição compartilham o mesmo formulário reativo com `FormArray` para os itens. Botões, cards, tabelas e modais são padronizados por `ui-button`, `ui-card`, `ui-table` e `ui-modal`; a criação de pedido usa o modal compartilhado sobre a listagem.
 
 ```text
 src/Stefanini.Pedidos.Webapp/src/app/
 ├── core/                  # configuração, interceptor e notificações
 ├── layout/                # header e shell da aplicação
-├── shared/                # page-header, loading, empty-state e utilitários
+├── shared/                # design system, estados visuais e utilitários
 └── features/pedidos/      # componentes, páginas, modelos, rotas e serviços HTTP
 ```
 

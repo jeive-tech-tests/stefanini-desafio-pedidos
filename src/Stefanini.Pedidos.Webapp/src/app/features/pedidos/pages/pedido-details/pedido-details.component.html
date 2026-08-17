@@ -13,9 +13,7 @@
     <app-loading label="Carregando detalhes..." />
   } @else if (pedido(); as order) {
     <div class="grid gap-5 lg:grid-cols-[1fr_320px]">
-      <section
-        class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-panel dark:border-slate-800 dark:bg-slate-900"
-      >
+      <app-ui-card padding="none" cardClass="overflow-hidden">
         <div class="border-b border-slate-200 p-6 dark:border-slate-800">
           <h2 class="font-bold text-slate-950 dark:text-white">Cliente</h2>
           <dl class="mt-4 grid gap-4 sm:grid-cols-2">
@@ -51,10 +49,8 @@
             }
           </div>
         </div>
-      </section>
-      <aside
-        class="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-panel dark:border-slate-800 dark:bg-slate-900"
-      >
+      </app-ui-card>
+      <app-ui-card cardClass="h-fit">
         <p-tag
           [severity]="order.pago ? 'success' : 'warn'"
           [value]="order.pago ? 'Pago' : 'Pendente'"
@@ -63,13 +59,14 @@
         ><strong class="mt-2 block text-3xl text-slate-950 dark:text-white">{{
           order.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2'
         }}</strong
-        ><a
-          pButton
-          class="mt-6 w-full justify-center"
+        ><app-ui-button
+          label="Editar pedido"
+          icon="pi pi-pencil"
+          buttonClass="mt-6"
+          [fluid]="true"
           [routerLink]="['/pedidos', order.id, 'editar']"
-          ><i class="pi pi-pencil"></i><span>Editar pedido</span></a
-        >
-      </aside>
+        />
+      </app-ui-card>
     </div>
   }
 </section>
