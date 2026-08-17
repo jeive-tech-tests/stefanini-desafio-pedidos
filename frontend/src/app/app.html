@@ -1,0 +1,31 @@
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" routerLink="/pedidos" aria-label="Ir para pedidos">
+      <span class="brand-mark" aria-hidden="true">SP</span>
+      <span>
+        <strong>Stefanini</strong>
+        <small>Gestão de pedidos</small>
+      </span>
+    </a>
+
+    <nav aria-label="Navegação principal">
+      <a
+        routerLink="/pedidos"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Pedidos
+      </a>
+      <a class="nav-cta" routerLink="/pedidos/novo">Novo pedido</a>
+    </nav>
+  </header>
+
+  <main>
+    <router-outlet />
+  </main>
+
+  <footer>
+    <span>Desafio Full Stack .NET + Angular</span>
+    <span>API REST • Clean Architecture • SQL Server</span>
+  </footer>
+</div>
