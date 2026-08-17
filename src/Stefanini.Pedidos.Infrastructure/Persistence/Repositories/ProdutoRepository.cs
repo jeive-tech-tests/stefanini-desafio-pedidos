@@ -6,6 +6,15 @@ namespace Stefanini.Pedidos.Infrastructure.Persistence.Repositories;
 
 public sealed class ProdutoRepository(PedidosDbContext context) : IProdutoRepository
 {
+    public Task<Produto?> ObterPorIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        return context.Produtos
+            .AsNoTracking()
+            .SingleOrDefaultAsync(produto => produto.Id == id, cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<Produto>> ListarAsync(
         CancellationToken cancellationToken = default)
     {

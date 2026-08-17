@@ -19,4 +19,16 @@ public sealed class ProdutosController(IProdutoService produtoService) : Control
 
         return Ok(produtos);
     }
+
+    [HttpGet("{id:int}/imagem")]
+    [Produces("image/svg+xml", "image/png", "image/jpeg")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ObterImagem(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        ProdutoImagemResponse imagem = await produtoService.ObterImagemAsync(id, cancellationToken);
+        return File(imagem.Conteudo, imagem.TipoConteudo, enableRangeProcessing: true);
+    }
 }

@@ -3,18 +3,23 @@
   [formGroup]="group"
 >
   <label
-    ><span class="mb-2 block text-xs font-semibold text-slate-500 lg:hidden">Produto</span
-    ><p-select
-      class="w-full"
-      formControlName="idProduto"
-      [options]="produtos"
-      optionLabel="nomeProduto"
-      optionValue="id"
-      placeholder="Selecione um produto"
-      appendTo="body"
-      [invalid]="group.controls.idProduto.touched && group.controls.idProduto.invalid"
-      [attr.aria-label]="'Produto do item ' + (index + 1)"
-    />
+    ><span class="mb-2 block text-xs font-semibold text-slate-500 lg:hidden">Produto</span>
+    <div class="flex items-center gap-2">
+      @if (selectedProduct; as product) {
+        <app-ui-product-image [src]="product.imagemUrl" [alt]="product.nomeProduto" size="sm" />
+      }
+      <p-select
+        class="min-w-0 flex-1"
+        formControlName="idProduto"
+        [options]="produtos"
+        optionLabel="nomeProduto"
+        optionValue="id"
+        placeholder="Selecione um produto"
+        appendTo="body"
+        [invalid]="group.controls.idProduto.touched && group.controls.idProduto.invalid"
+        [attr.aria-label]="'Produto do item ' + (index + 1)"
+      />
+    </div>
     @if (group.controls.idProduto.touched && group.controls.idProduto.invalid) {
       <small class="mt-1.5 block text-xs text-red-500">Selecione um produto.</small>
     }

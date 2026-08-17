@@ -6,6 +6,8 @@ public interface IProdutoRepository
 {
     Task<IReadOnlyCollection<Produto>> ListarAsync(CancellationToken cancellationToken = default);
 
+    Task<Produto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyCollection<Produto>> ObterPorIdsAsync(
         IReadOnlyCollection<int> ids,
         CancellationToken cancellationToken = default);

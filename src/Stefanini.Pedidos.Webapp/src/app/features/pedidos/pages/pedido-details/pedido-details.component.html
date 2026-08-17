@@ -32,8 +32,13 @@
           <div class="grid gap-3">
             @for (item of order.itensPedido; track item.id) {
               <article
-                class="grid gap-2 rounded-xl border border-slate-200 p-4 sm:grid-cols-[1fr_auto_auto] sm:items-center dark:border-slate-800"
+                class="grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-[auto_1fr_auto_auto] sm:items-center dark:border-blue-900/70"
               >
+                <app-ui-product-image
+                  [src]="imagemProduto(item.idProduto)"
+                  [alt]="item.nomeProduto"
+                  size="lg"
+                />
                 <div>
                   <strong>{{ item.nomeProduto }}</strong
                   ><small class="mt-1 block text-slate-500"
