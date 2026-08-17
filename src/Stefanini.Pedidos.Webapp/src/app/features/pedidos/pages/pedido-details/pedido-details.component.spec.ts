@@ -1,6 +1,7 @@
 import { Signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
@@ -13,6 +14,7 @@ interface PedidoDetailsHarness {
   produtos: Signal<Produto[]>;
   carregando: Signal<boolean>;
   imagemProduto(idProduto: number): string;
+  fechar(): void;
 }
 
 describe('PedidoDetailsComponent', () => {
@@ -46,6 +48,7 @@ describe('PedidoDetailsComponent', () => {
       imports: [PedidoDetailsComponent],
       providers: [
         provideRouter([]),
+        provideNoopAnimations(),
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: convertToParamMap({ id: '42' }) } },
@@ -76,5 +79,16 @@ describe('PedidoDetailsComponent', () => {
 
     expect(component.imagemProduto(1)).toBe('/api/produtos/1/imagem');
     expect(component.imagemProduto(999)).toBe('');
+  });
+
+  it('fecha a modal sem solicitar atualização da listagem', () => {
+    const fixture = TestBed.createComponent(PedidoDetailsComponent);
+    const router = TestBed.inject(Router);
+    const navegar = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    fixture.detectChanges();
+
+    (fixture.componentInstance as unknown as PedidoDetailsHarness).fechar();
+
+    expect(navegar).toHaveBeenCalledWith(['/pedidos']);
   });
 });

@@ -11,6 +11,7 @@ import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
 import { SumarioPedidos } from '../../models/sumario-pedidos.model';
 import { PedidoService } from '../../services/pedido.service';
+import { PedidoListRefreshService } from '../../services/pedido-list-refresh.service';
 import { ProdutoService } from '../../services/produto.service';
 import { PedidoListComponent } from './pedido-list.component';
 
@@ -126,6 +127,17 @@ describe('PedidoListComponent', () => {
     expect(component.tamanhoPagina()).toBe(20);
     expect(listarPedidos).toHaveBeenLastCalledWith({ pagina: 2, tamanhoPagina: 20 });
     expect(obterSumario).toHaveBeenCalledTimes(1);
+  });
+
+  it('recarrega tabela e sumário somente quando uma alteração é solicitada', () => {
+    const fixture = TestBed.createComponent(PedidoListComponent);
+    const listRefresh = TestBed.inject(PedidoListRefreshService);
+    fixture.detectChanges();
+
+    listRefresh.requestRefresh();
+
+    expect(listarPedidos).toHaveBeenCalledTimes(2);
+    expect(obterSumario).toHaveBeenCalledTimes(2);
   });
 
   it('aguarda o fim da digitação antes de pesquisar pelo cliente', async () => {
