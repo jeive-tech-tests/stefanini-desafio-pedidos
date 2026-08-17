@@ -57,6 +57,8 @@ Pré-requisito: Docker Desktop ou Docker Engine com Compose.
    cp .env.example .env
    ```
 
+   Se a porta local `1433` já estiver em uso, altere `MSSQL_HOST_PORT` no `.env`.
+
 2. Suba a aplicação e o banco:
 
    ```bash
@@ -65,9 +67,9 @@ Pré-requisito: Docker Desktop ou Docker Engine com Compose.
 
 3. Acesse:
 
-   - aplicação: <http://localhost:8080>
-   - Swagger: <http://localhost:8080/swagger>
-   - health check: <http://localhost:8080/health>
+   - aplicação: <http://localhost:8080/stefanini-desafio-pedidos/>
+   - Swagger: <http://localhost:8080/stefanini-desafio-pedidos/swagger>
+   - health check interno: <http://localhost:8080/health>
 
 O container da aplicação aguarda o SQL Server ficar saudável, aplica as migrations automaticamente e serve o build do Angular pela própria API. Os dados permanecem no volume `sqlserver-data`.
 
@@ -97,9 +99,11 @@ Fluxo do deploy:
 4. o workflow aguarda o endpoint `/health` responder com sucesso;
 5. o arquivo `.env` temporário é removido mesmo se o job falhar.
 
-O banco não é publicado na rede externa: a porta `1433` fica vinculada somente a `127.0.0.1`. A aplicação permanece disponível na porta `8080` do servidor.
+O banco e a aplicação não publicam portas diretamente na rede externa: `1433` e `8080` ficam vinculadas somente a `127.0.0.1`. O Nginx entrega a aplicação publicamente em <https://jeive.dev/stefanini-desafio-pedidos/> e encaminha <https://jeive.dev/stefanini-desafio-pedidos/api/> para a API.
 
 O runner precisa possuir os rótulos `self-hosted`, `Linux`, `X64` e `deploy`. Também é possível executar o workflow manualmente pela interface do GitHub, mas a validação do job impede deploy de qualquer referência diferente de `main`.
+
+O proxy reverso está versionado em `deploy/nginx/jeive.dev.conf`. O certificado TLS de `jeive.dev` e `www.jeive.dev` é emitido pelo Let's Encrypt e renovado pelo timer do Certbot no servidor.
 
 ## Desenvolvimento local
 

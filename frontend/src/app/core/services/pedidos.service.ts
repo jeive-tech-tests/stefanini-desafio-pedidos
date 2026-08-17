@@ -3,11 +3,12 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PedidoRequest, PedidoResponse, PedidosFiltro } from '../models/pedido.model';
 import { ResultadoPaginado } from '../models/resultado-paginado.model';
+import { apiUrl } from '../utils/api-url';
 
 @Injectable({ providedIn: 'root' })
 export class PedidosService {
   private readonly http = inject(HttpClient);
-  private readonly url = '/api/pedidos';
+  private readonly url = apiUrl('pedidos');
 
   listar(filtro: PedidosFiltro): Observable<ResultadoPaginado<PedidoResponse>> {
     let params = new HttpParams()
