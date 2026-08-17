@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-empty-state',
+  selector: 'app-ui-empty-state',
   template: `<div class="grid min-h-72 place-items-center p-8 text-center">
     <div>
       <span
@@ -15,7 +15,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   </div>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EmptyStateComponent {
+export class UiEmptyStateComponent {
   @Input() icon = 'pi pi-inbox';
   @Input({ required: true }) title = '';
   @Input() description = '';

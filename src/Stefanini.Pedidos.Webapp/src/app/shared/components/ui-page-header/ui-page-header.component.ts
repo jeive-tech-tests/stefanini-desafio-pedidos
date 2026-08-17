@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-page-header',
+  selector: 'app-ui-page-header',
   template: `<header class="mb-7">
     <span class="text-xs font-bold uppercase tracking-[0.16em] text-blue-600 dark:text-blue-400">{{
       eyebrow
@@ -16,7 +16,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   </header>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PageHeaderComponent {
+export class UiPageHeaderComponent {
   @Input() eyebrow = '';
   @Input({ required: true }) title = '';
   @Input() description = '';

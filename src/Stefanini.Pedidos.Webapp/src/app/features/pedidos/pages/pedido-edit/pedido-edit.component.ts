@@ -11,7 +11,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
-import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { UiPageHeaderComponent } from '../../../../shared/components/ui-page-header/ui-page-header.component';
 import { PedidoFormComponent } from '../../components/pedido-form/pedido-form.component';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
@@ -21,7 +21,7 @@ import { ProdutoService } from '../../services/produto.service';
 
 @Component({
   selector: 'app-pedido-edit',
-  imports: [PageHeaderComponent, PedidoFormComponent, RouterLink, UiLoadingComponent],
+  imports: [PedidoFormComponent, RouterLink, UiLoadingComponent, UiPageHeaderComponent],
   templateUrl: './pedido-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

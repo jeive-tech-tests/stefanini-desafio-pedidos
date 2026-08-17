@@ -14,7 +14,7 @@ import { RouterLink } from '@angular/router';
 import { debounceTime, finalize } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { mensagemErroHttp } from '../../../../shared/utils/http-error';
-import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { UiEmptyStateComponent } from '../../../../shared/components/ui-empty-state/ui-empty-state.component';
 import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
@@ -44,7 +44,7 @@ type StatusFiltro = 'todos' | 'pago' | 'pendente';
     CurrencyPipe,
     ReactiveFormsModule,
     RouterLink,
-    EmptyStateComponent,
+    UiEmptyStateComponent,
     UiLoadingComponent,
     UiButtonComponent,
     UiCardComponent,
