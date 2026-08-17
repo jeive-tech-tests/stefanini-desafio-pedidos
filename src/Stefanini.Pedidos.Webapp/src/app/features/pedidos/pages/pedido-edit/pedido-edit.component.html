@@ -1,0 +1,22 @@
+<section class="mx-auto w-full max-w-[1320px] px-4 py-7 sm:px-6 sm:py-9 lg:px-10">
+  <a
+    class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500"
+    [routerLink]="['/pedidos', id]"
+    ><i class="pi pi-arrow-left"></i>Voltar aos detalhes</a
+  ><app-page-header
+    eyebrow="Atualização"
+    [title]="'Editar pedido #' + id"
+    description="Atualize os dados do cliente, os itens e a situação do pagamento."
+  />
+  @if (carregando()) {
+    <app-loading label="Carregando pedido..." />
+  } @else {
+    <app-pedido-form
+      [pedido]="pedido()"
+      [produtos]="produtos()"
+      [salvando]="salvando()"
+      (submitted)="salvar($event)"
+      (cancelled)="cancelar()"
+    />
+  }
+</section>

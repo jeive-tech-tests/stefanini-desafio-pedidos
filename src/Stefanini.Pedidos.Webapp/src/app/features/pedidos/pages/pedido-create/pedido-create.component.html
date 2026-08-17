@@ -1,0 +1,21 @@
+<section class="mx-auto w-full max-w-[1320px] px-4 py-7 sm:px-6 sm:py-9 lg:px-10">
+  <a
+    class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500"
+    routerLink="/pedidos"
+    ><i class="pi pi-arrow-left"></i>Voltar para pedidos</a
+  ><app-page-header
+    eyebrow="Novo registro"
+    title="Criar pedido"
+    description="Informe os dados do cliente e selecione os produtos."
+  />
+  @if (carregando()) {
+    <app-loading label="Carregando formulário..." />
+  } @else {
+    <app-pedido-form
+      [produtos]="produtos()"
+      [salvando]="salvando()"
+      (submitted)="salvar($event)"
+      (cancelled)="cancelar()"
+    />
+  }
+</section>

@@ -1,10 +1,10 @@
 FROM node:24-alpine AS frontend-build
-WORKDIR /src/frontend
+WORKDIR /src/webapp
 
-COPY frontend/package.json frontend/package-lock.json ./
+COPY src/Stefanini.Pedidos.Webapp/package.json src/Stefanini.Pedidos.Webapp/package-lock.json ./
 RUN npm ci
 
-COPY frontend/ ./
+COPY src/Stefanini.Pedidos.Webapp/ ./
 RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api-build
@@ -26,7 +26,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
 COPY --from=api-build /app/publish ./
-COPY --from=frontend-build /src/frontend/dist/stefanini-pedidos-web/browser ./wwwroot
+COPY --from=frontend-build /src/webapp/dist/stefanini-pedidos-webapp/browser ./wwwroot
 
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080
