@@ -167,11 +167,11 @@
     @if (carregando()) {
       <app-ui-loading label="Carregando pedidos..." />
     } @else if (pedidos().length === 0) {
-      <app-empty-state
+      <app-ui-empty-state
         title="Nenhum pedido encontrado"
         description="Ajuste os filtros ou cadastre o primeiro pedido."
         ><app-ui-button label="Criar pedido" icon="pi pi-plus" routerLink="/pedidos/novo"
-      /></app-empty-state>
+      /></app-ui-empty-state>
     } @else {
       <ng-template #tableHeader>
         <tr>

@@ -11,7 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
-import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { UiPageHeaderComponent } from '../../../../shared/components/ui-page-header/ui-page-header.component';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
 import { UiProductImageComponent } from '../../../../shared/components/ui-product-image/ui-product-image.component';
@@ -26,7 +26,7 @@ import { Produto } from '../../models/produto.model';
   imports: [
     CurrencyPipe,
     UiLoadingComponent,
-    PageHeaderComponent,
+    UiPageHeaderComponent,
     RouterLink,
     UiButtonComponent,
     UiCardComponent,
