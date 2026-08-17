@@ -1,5 +1,5 @@
 @if (erro()) {
-  <p-message class="mb-5 block" severity="error">{{ erro() }}</p-message>
+  <app-ui-message class="mb-5" severity="error">{{ erro() }}</app-ui-message>
 }
 <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
   <div class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
@@ -18,12 +18,11 @@
         <div class="grid gap-5 md:grid-cols-2">
           <label
             ><span class="mb-2 block text-sm font-semibold">Nome completo *</span
-            ><input
-              pInputText
-              class="w-full"
+            ><app-ui-input
+              inputClass="w-full"
               formControlName="nomeCliente"
               placeholder="Ex.: Maria da Silva"
-              maxlength="60"
+              [maxlength]="60"
               [invalid]="form.controls.nomeCliente.touched && form.controls.nomeCliente.invalid"
             />
             @if (form.controls.nomeCliente.touched && form.controls.nomeCliente.invalid) {
@@ -34,13 +33,12 @@
           </label>
           <label
             ><span class="mb-2 block text-sm font-semibold">E-mail *</span
-            ><input
-              pInputText
-              class="w-full"
+            ><app-ui-input
+              inputClass="w-full"
               type="email"
               formControlName="emailCliente"
               placeholder="cliente@email.com"
-              maxlength="60"
+              [maxlength]="60"
               [invalid]="form.controls.emailCliente.touched && form.controls.emailCliente.invalid"
             />
             @if (form.controls.emailCliente.touched && form.controls.emailCliente.invalid) {
@@ -111,7 +109,7 @@
         }}</strong>
       </div>
       <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4"
-        ><p-toggleswitch formControlName="pago" ariaLabel="Pedido pago" /><span
+        ><app-ui-toggle-switch formControlName="pago" ariaLabel="Pedido pago" /><span
           ><strong class="block text-sm">Pedido pago</strong
           ><small class="text-xs text-slate-500">Marque se o pagamento foi confirmado.</small></span
         ></label

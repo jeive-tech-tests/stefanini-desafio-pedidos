@@ -14,14 +14,14 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { MessageModule } from 'primeng/message';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { CreatePedido } from '../../models/create-pedido.model';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
+import { UiInputComponent } from '../../../../shared/components/ui-input/ui-input.component';
+import { UiMessageComponent } from '../../../../shared/components/ui-message/ui-message.component';
+import { UiToggleSwitchComponent } from '../../../../shared/components/ui-toggle-switch/ui-toggle-switch.component';
 import {
   PedidoItemFormComponent,
   PedidoItemFormGroup,
@@ -32,13 +32,13 @@ import {
   selector: 'app-pedido-form',
   imports: [
     CurrencyPipe,
-    InputTextModule,
-    MessageModule,
     PedidoItemFormComponent,
     ReactiveFormsModule,
-    ToggleSwitchModule,
     UiButtonComponent,
     UiCardComponent,
+    UiInputComponent,
+    UiMessageComponent,
+    UiToggleSwitchComponent,
   ],
   templateUrl: './pedido-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

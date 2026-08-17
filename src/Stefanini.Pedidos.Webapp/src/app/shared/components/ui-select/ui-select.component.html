@@ -1,0 +1,14 @@
+<p-select
+  [ngModel]="value"
+  (ngModelChange)="updateValue($event)"
+  [options]="options"
+  [optionLabel]="optionLabel"
+  [optionValue]="optionValue"
+  [placeholder]="placeholder"
+  [appendTo]="appendTo"
+  [invalid]="invalid"
+  [disabled]="disabled"
+  [class]="selectClass"
+  [attr.aria-label]="ariaLabel"
+  (onBlur)="markAsTouched()"
+/>

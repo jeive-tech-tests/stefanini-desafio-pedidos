@@ -9,7 +9,7 @@
     description="Atualize os dados do cliente, os itens e a situação do pagamento."
   />
   @if (carregando()) {
-    <app-loading label="Carregando pedido..." />
+    <app-ui-loading label="Carregando pedido..." />
   } @else {
     <app-pedido-form
       [pedido]="pedido()"

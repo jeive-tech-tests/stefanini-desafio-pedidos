@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ToastModule } from 'primeng/toast';
 import { HeaderComponent } from '../header/header.component';
+import { UiToastComponent } from '../../shared/components/ui-toast/ui-toast.component';
 
 @Component({
   selector: 'app-shell',
-  imports: [HeaderComponent, RouterOutlet, ToastModule],
+  imports: [HeaderComponent, RouterOutlet, UiToastComponent],
   templateUrl: './shell.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -9,13 +9,13 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { TagModule } from 'primeng/tag';
 import { finalize, forkJoin } from 'rxjs';
-import { LoadingComponent } from '../../../../shared/components/loading/loading.component';
+import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
 import { UiProductImageComponent } from '../../../../shared/components/ui-product-image/ui-product-image.component';
+import { UiTagComponent } from '../../../../shared/components/ui-tag/ui-tag.component';
 import { Pedido } from '../../models/pedido.model';
 import { PedidoService } from '../../services/pedido.service';
 import { ProdutoService } from '../../services/produto.service';
@@ -25,13 +25,13 @@ import { Produto } from '../../models/produto.model';
   selector: 'app-pedido-details',
   imports: [
     CurrencyPipe,
-    LoadingComponent,
+    UiLoadingComponent,
     PageHeaderComponent,
     RouterLink,
-    TagModule,
     UiButtonComponent,
     UiCardComponent,
     UiProductImageComponent,
+    UiTagComponent,
   ],
   templateUrl: './pedido-details.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

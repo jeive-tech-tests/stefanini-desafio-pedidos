@@ -4,7 +4,7 @@
     Informe os dados do cliente e selecione os produtos do pedido.
   </p>
   @if (carregando()) {
-    <app-loading label="Carregando formulário..." />
+    <app-ui-loading label="Carregando formulário..." />
   } @else {
     <app-pedido-form
       [produtos]="produtos()"

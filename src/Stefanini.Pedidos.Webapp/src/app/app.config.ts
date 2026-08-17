@@ -3,7 +3,7 @@ import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { AppTheme } from './app-theme';
 import { routes } from './app.routes';
@@ -15,6 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([errorInterceptor])),
     provideRouter(routes),
+    ConfirmationService,
     MessageService,
     providePrimeNG({
       ripple: true,

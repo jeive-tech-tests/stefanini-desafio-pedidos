@@ -1,11 +1,11 @@
 import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { SelectModule } from 'primeng/select';
 import { Produto } from '../../models/produto.model';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiProductImageComponent } from '../../../../shared/components/ui-product-image/ui-product-image.component';
+import { UiInputNumberComponent } from '../../../../shared/components/ui-input-number/ui-input-number.component';
+import { UiSelectComponent } from '../../../../shared/components/ui-select/ui-select.component';
 
 export type PedidoItemFormGroup = FormGroup<{
   idProduto: FormControl<number | null>;
@@ -29,11 +29,11 @@ export function createPedidoItemForm(
   selector: 'app-pedido-item-form',
   imports: [
     CurrencyPipe,
-    InputNumberModule,
     ReactiveFormsModule,
-    SelectModule,
     UiButtonComponent,
+    UiInputNumberComponent,
     UiProductImageComponent,
+    UiSelectComponent,
   ],
   templateUrl: './pedido-item-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

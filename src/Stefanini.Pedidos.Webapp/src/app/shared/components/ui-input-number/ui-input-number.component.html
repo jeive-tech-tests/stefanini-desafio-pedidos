@@ -1,0 +1,15 @@
+<p-inputnumber
+  [ngModel]="value"
+  (ngModelChange)="updateValue($event)"
+  [min]="min"
+  [max]="max"
+  [showButtons]="showButtons"
+  [buttonLayout]="buttonLayout"
+  [incrementButtonIcon]="incrementButtonIcon"
+  [decrementButtonIcon]="decrementButtonIcon"
+  [invalid]="invalid"
+  [disabled]="disabled"
+  [class]="inputClass"
+  [attr.aria-label]="ariaLabel"
+  (onBlur)="markAsTouched()"
+/>

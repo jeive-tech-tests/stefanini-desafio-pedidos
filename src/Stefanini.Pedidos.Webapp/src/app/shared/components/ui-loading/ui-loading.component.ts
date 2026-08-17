@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
-  selector: 'app-loading',
+  selector: 'app-ui-loading',
   imports: [ProgressSpinnerModule],
   template: `<div class="grid min-h-72 place-items-center p-8" role="status">
     <div class="text-center">
@@ -12,6 +12,6 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
   </div>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoadingComponent {
+export class UiLoadingComponent {
   @Input() label = 'Carregando...';
 }

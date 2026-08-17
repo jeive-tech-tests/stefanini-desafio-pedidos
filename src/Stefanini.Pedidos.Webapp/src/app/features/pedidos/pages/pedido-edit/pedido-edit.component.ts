@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { LoadingComponent } from '../../../../shared/components/loading/loading.component';
+import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { PedidoFormComponent } from '../../components/pedido-form/pedido-form.component';
 import { Pedido } from '../../models/pedido.model';
@@ -21,7 +21,7 @@ import { ProdutoService } from '../../services/produto.service';
 
 @Component({
   selector: 'app-pedido-edit',
-  imports: [LoadingComponent, PageHeaderComponent, PedidoFormComponent, RouterLink],
+  imports: [PageHeaderComponent, PedidoFormComponent, RouterLink, UiLoadingComponent],
   templateUrl: './pedido-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

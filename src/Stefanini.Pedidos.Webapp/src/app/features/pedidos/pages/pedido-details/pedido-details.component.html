@@ -10,7 +10,7 @@
     description="Dados completos do cliente, pagamento e itens do pedido."
   />
   @if (carregando()) {
-    <app-loading label="Carregando detalhes..." />
+    <app-ui-loading label="Carregando detalhes..." />
   } @else if (pedido(); as order) {
     <div class="grid gap-5 lg:grid-cols-[1fr_320px]">
       <app-ui-card padding="none" cardClass="overflow-hidden">
@@ -56,7 +56,7 @@
         </div>
       </app-ui-card>
       <app-ui-card cardClass="h-fit">
-        <p-tag
+        <app-ui-tag
           [severity]="order.pago ? 'success' : 'warn'"
           [value]="order.pago ? 'Pago' : 'Pendente'"
           [rounded]="true"

@@ -7,8 +7,15 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { PaginatorModule, PaginatorState } from 'primeng/paginator';
+import { PaginatorModule } from 'primeng/paginator';
 import { TableModule } from 'primeng/table';
+
+export interface UiPageChange {
+  page?: number;
+  first?: number;
+  rows?: number;
+  pageCount?: number;
+}
 
 @Component({
   selector: 'app-ui-table',
@@ -26,5 +33,5 @@ export class UiTableComponent {
   @Input() totalRecords = 0;
   @Input() rowsPerPageOptions: number[] = [5, 10, 20];
   @Input() currentPageReportTemplate = 'Mostrando {first} a {last} de {totalRecords} registros';
-  @Output() pageChange = new EventEmitter<PaginatorState>();
+  @Output() pageChange = new EventEmitter<UiPageChange>();
 }
