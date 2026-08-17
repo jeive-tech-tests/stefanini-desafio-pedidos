@@ -7,21 +7,22 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
-import { UiPageHeaderComponent } from '../../../../shared/components/ui-page-header/ui-page-header.component';
+import { UiModalComponent } from '../../../../shared/components/ui-modal/ui-modal.component';
 import { PedidoFormComponent } from '../../components/pedido-form/pedido-form.component';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
 import { UpdatePedido } from '../../models/update-pedido.model';
 import { PedidoService } from '../../services/pedido.service';
 import { ProdutoService } from '../../services/produto.service';
+import { PedidoListComponent } from '../pedido-list/pedido-list.component';
 
 @Component({
   selector: 'app-pedido-edit',
-  imports: [PedidoFormComponent, RouterLink, UiLoadingComponent, UiPageHeaderComponent],
+  imports: [PedidoFormComponent, PedidoListComponent, UiLoadingComponent, UiModalComponent],
   templateUrl: './pedido-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -65,12 +66,12 @@ export class PedidoEditComponent implements OnInit {
             'Pedido atualizado',
             `Pedido #${pedido.id} atualizado com sucesso.`,
           );
-          void this.router.navigate(['/pedidos', pedido.id]);
+          void this.router.navigate(['/pedidos']);
         },
         error: () => undefined,
       });
   }
   protected cancelar(): void {
-    void this.router.navigate(['/pedidos', this.id]);
+    void this.router.navigate(['/pedidos']);
   }
 }

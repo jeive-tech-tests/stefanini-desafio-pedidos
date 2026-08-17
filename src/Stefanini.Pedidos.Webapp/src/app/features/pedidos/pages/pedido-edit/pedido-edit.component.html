@@ -1,15 +1,10 @@
-<section class="mx-auto w-full max-w-[1320px] px-4 py-7 sm:px-6 sm:py-9 lg:px-10">
-  <a
-    class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500"
-    [routerLink]="['/pedidos', id]"
-    ><i class="pi pi-arrow-left"></i>Voltar aos detalhes</a
-  ><app-ui-page-header
-    eyebrow="Atualização"
-    [title]="'Editar pedido #' + id"
-    description="Atualize os dados do cliente, os itens e a situação do pagamento."
-  />
+<app-pedido-list />
+<app-ui-modal [visible]="true" [header]="'Editar pedido #' + id" (closed)="cancelar()">
+  <p class="mb-6 text-sm text-slate-500 dark:text-blue-200/70">
+    Atualize os dados do cliente, os itens e a situação do pagamento.
+  </p>
   @if (carregando()) {
-    <app-ui-loading label="Carregando pedido..." />
+    <app-ui-loading label="Carregando formulário..." />
   } @else {
     <app-pedido-form
       [pedido]="pedido()"
@@ -19,4 +14,4 @@
       (cancelled)="cancelar()"
     />
   }
-</section>
+</app-ui-modal>
