@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Stefanini.Pedidos.Application.Abstractions.Persistence;
 using Stefanini.Pedidos.Domain.Entities;
 
 namespace Stefanini.Pedidos.Infrastructure.Persistence;
 
-public sealed class PedidosDbContext(DbContextOptions<PedidosDbContext> options) : DbContext(options)
+public sealed class PedidosDbContext(DbContextOptions<PedidosDbContext> options)
+    : DbContext(options), IUnitOfWork
 {
     public DbSet<Pedido> Pedidos => Set<Pedido>();
 
