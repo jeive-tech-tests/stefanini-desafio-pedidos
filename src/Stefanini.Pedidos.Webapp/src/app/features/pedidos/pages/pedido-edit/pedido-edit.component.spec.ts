@@ -2,14 +2,13 @@ import { Signal } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
 import { of } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { UiConfirmationService } from '../../../../shared/components/ui-confirm-dialog/ui-confirm-dialog.component';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
 import { UpdatePedido } from '../../models/update-pedido.model';
 import { PedidoService } from '../../services/pedido.service';
+import { PedidoListRefreshService } from '../../services/pedido-list-refresh.service';
 import { ProdutoService } from '../../services/produto.service';
 import { PedidoEditComponent } from './pedido-edit.component';
 
@@ -48,35 +47,29 @@ describe('PedidoEditComponent', () => {
   const obterPorId = vi.fn();
   const atualizar = vi.fn();
   const notificar = vi.fn();
+  const requestRefresh = vi.fn();
 
   beforeEach(async () => {
     obterPorId.mockReset().mockReturnValue(of(pedido));
     atualizar.mockReset().mockReturnValue(of({ ...pedido, nomeCliente: 'Atualizado', pago: true }));
     notificar.mockReset();
+    requestRefresh.mockReset();
     await TestBed.configureTestingModule({
       imports: [PedidoEditComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        ConfirmationService,
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: convertToParamMap({ id: '42' }) } },
         },
         {
           provide: PedidoService,
-          useValue: {
-            obterPorId,
-            atualizar,
-            obterSumario: () =>
-              of({ totalPedidos: 1, valorTotal: 200, pedidosPagos: 1, pedidosPendentes: 0 }),
-            listar: () =>
-              of({ itens: [pedido], pagina: 1, tamanhoPagina: 8, totalItens: 1, totalPaginas: 1 }),
-          },
+          useValue: { obterPorId, atualizar },
         },
+        { provide: PedidoListRefreshService, useValue: { requestRefresh } },
         { provide: ProdutoService, useValue: { listar: () => of([produto]) } },
         { provide: NotificationService, useValue: { success: notificar } },
-        { provide: UiConfirmationService, useValue: { confirm: vi.fn() } },
       ],
     }).compileComponents();
   });
@@ -112,6 +105,7 @@ describe('PedidoEditComponent', () => {
       'Pedido atualizado',
       'Pedido #42 atualizado com sucesso.',
     );
+    expect(requestRefresh).toHaveBeenCalledTimes(1);
     expect(navegar).toHaveBeenCalledWith(['/pedidos']);
   });
 
@@ -124,5 +118,6 @@ describe('PedidoEditComponent', () => {
     (fixture.componentInstance as unknown as PedidoEditHarness).cancelar();
 
     expect(navegar).toHaveBeenCalledWith(['/pedidos']);
+    expect(requestRefresh).not.toHaveBeenCalled();
   });
 });

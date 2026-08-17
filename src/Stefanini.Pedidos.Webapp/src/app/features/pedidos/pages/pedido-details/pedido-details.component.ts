@@ -8,12 +8,12 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
-import { UiPageHeaderComponent } from '../../../../shared/components/ui-page-header/ui-page-header.component';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
+import { UiModalComponent } from '../../../../shared/components/ui-modal/ui-modal.component';
 import { UiProductImageComponent } from '../../../../shared/components/ui-product-image/ui-product-image.component';
 import { UiTagComponent } from '../../../../shared/components/ui-tag/ui-tag.component';
 import { Pedido } from '../../models/pedido.model';
@@ -26,10 +26,10 @@ import { Produto } from '../../models/produto.model';
   imports: [
     CurrencyPipe,
     UiLoadingComponent,
-    UiPageHeaderComponent,
     RouterLink,
     UiButtonComponent,
     UiCardComponent,
+    UiModalComponent,
     UiProductImageComponent,
     UiTagComponent,
   ],
@@ -40,6 +40,7 @@ export class PedidoDetailsComponent implements OnInit {
   private readonly service = inject(PedidoService);
   private readonly produtoService = inject(ProdutoService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly id = Number(this.route.snapshot.paramMap.get('id'));
   protected readonly pedido = signal<Pedido | null>(null);
@@ -65,5 +66,9 @@ export class PedidoDetailsComponent implements OnInit {
 
   protected imagemProduto(idProduto: number): string {
     return this.produtos().find((produto) => produto.id === idProduto)?.imagemUrl ?? '';
+  }
+
+  protected fechar(): void {
+    void this.router.navigate(['/pedidos']);
   }
 }

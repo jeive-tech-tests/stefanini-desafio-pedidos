@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import {
   EMPTY,
   Subject,
@@ -44,6 +44,7 @@ import { UiTagComponent } from '../../../../shared/components/ui-tag/ui-tag.comp
 import { Pedido } from '../../models/pedido.model';
 import { PedidosQuery } from '../../models/pedidos-query.model';
 import { PedidoService } from '../../services/pedido.service';
+import { PedidoListRefreshService } from '../../services/pedido-list-refresh.service';
 import { ProdutoService } from '../../services/produto.service';
 import { Produto } from '../../models/produto.model';
 import { SumarioPedidos } from '../../models/sumario-pedidos.model';
@@ -57,6 +58,7 @@ const TEMPO_ESPERA_FILTRO_MS = 500;
     CurrencyPipe,
     ReactiveFormsModule,
     RouterLink,
+    RouterOutlet,
     UiEmptyStateComponent,
     UiLoadingComponent,
     UiButtonComponent,
@@ -73,6 +75,7 @@ const TEMPO_ESPERA_FILTRO_MS = 500;
 })
 export class PedidoListComponent implements OnInit {
   private readonly pedidosService = inject(PedidoService);
+  private readonly listRefresh = inject(PedidoListRefreshService);
   private readonly produtosService = inject(ProdutoService);
   private readonly notifications = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
@@ -160,6 +163,10 @@ export class PedidoListComponent implements OnInit {
         this.pagina.set(1);
         this.carregar();
       });
+
+    this.listRefresh.refreshRequested$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.carregarTudo());
 
     this.carregarTudo();
   }
