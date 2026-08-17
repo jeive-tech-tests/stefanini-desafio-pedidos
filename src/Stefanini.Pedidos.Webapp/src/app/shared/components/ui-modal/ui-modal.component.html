@@ -5,8 +5,16 @@
   [closable]="closable"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width, maxHeight: '94vh' }"
-  [contentStyle]="{ overflow: 'auto' }"
+  [blockScroll]="true"
+  [closeOnEscape]="true"
+  [breakpoints]="{ '768px': 'calc(100vw - 1rem)' }"
+  [style]="{ width, maxHeight: '94dvh', display: 'flex', flexDirection: 'column' }"
+  [contentStyle]="{
+    minHeight: 0,
+    maxHeight: 'calc(94dvh - 5rem)',
+    overflowY: 'auto',
+    overflowX: 'hidden',
+  }"
   (visibleChange)="changeVisibility($event)"
 >
   <ng-content />

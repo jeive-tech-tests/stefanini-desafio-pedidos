@@ -13,7 +13,7 @@ import { SelectModule } from 'primeng/select';
   selector: 'app-ui-select',
   imports: [FormsModule, SelectModule],
   templateUrl: './ui-select.component.html',
-  host: { class: 'block' },
+  host: { class: 'block min-w-0' },
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -33,6 +33,11 @@ export class UiSelectComponent implements ControlValueAccessor {
   @Input() invalid = false;
   @Input() ariaLabel?: string;
   @Input() selectClass = '';
+  @Input() filter = false;
+  @Input() filterBy?: string;
+  @Input() filterPlaceholder = 'Buscar...';
+  @Input() emptyFilterMessage = 'Nenhum resultado encontrado.';
+  @Input() resetFilterOnHide = true;
 
   protected value: unknown = null;
   protected disabled = false;
