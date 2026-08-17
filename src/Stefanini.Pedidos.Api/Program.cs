@@ -34,7 +34,11 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         };
 
         problemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
-        return new BadRequestObjectResult(problemDetails);
+        return new ObjectResult(problemDetails)
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+            ContentTypes = { "application/problem+json" }
+        };
     };
 });
 
