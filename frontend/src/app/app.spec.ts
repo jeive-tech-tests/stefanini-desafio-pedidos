@@ -3,6 +3,8 @@ import { provideRouter } from '@angular/router';
 import { App } from './app';
 
 describe('App', () => {
+  afterEach(() => document.documentElement.classList.remove('app-dark'));
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
@@ -20,7 +22,22 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.brand')?.textContent).toContain('Stefanini');
+    expect(compiled.querySelector('[aria-label="Ir para pedidos"]')?.textContent).toContain(
+      'Pedidos',
+    );
     expect(compiled.querySelector('nav')?.textContent).toContain('Novo pedido');
+  });
+
+  it('should toggle the dark theme', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const button = fixture.nativeElement.querySelector(
+      '[aria-label="Ativar tema escuro"]',
+    ) as HTMLButtonElement;
+
+    button.click();
+    fixture.detectChanges();
+
+    expect(document.documentElement.classList.contains('app-dark')).toBe(true);
   });
 });

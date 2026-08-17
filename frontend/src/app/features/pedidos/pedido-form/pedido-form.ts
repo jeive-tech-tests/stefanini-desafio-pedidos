@@ -11,6 +11,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Observable, finalize, forkJoin, of } from 'rxjs';
+import { ButtonModule } from 'primeng/button';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { PedidoRequest, PedidoResponse } from '../../../core/models/pedido.model';
 import { ProdutoResponse } from '../../../core/models/produto.model';
 import { PedidosService } from '../../../core/services/pedidos.service';
@@ -24,9 +31,19 @@ type ItemPedidoForm = FormGroup<{
 
 @Component({
   selector: 'app-pedido-form',
-  imports: [CurrencyPipe, ReactiveFormsModule, RouterLink],
+  imports: [
+    ButtonModule,
+    CurrencyPipe,
+    InputNumberModule,
+    InputTextModule,
+    MessageModule,
+    ProgressSpinnerModule,
+    ReactiveFormsModule,
+    RouterLink,
+    SelectModule,
+    ToggleSwitchModule,
+  ],
   templateUrl: './pedido-form.html',
-  styleUrl: './pedido-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoForm implements OnInit {

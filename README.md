@@ -26,7 +26,7 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 | Arquitetura         | Clean Architecture, DDD tático, Repository e Unit of Work |
 | Banco de dados      | SQL Server 2022                                           |
 | Documentação da API | Swagger/OpenAPI                                           |
-| Frontend            | Angular 22, TypeScript 6, RxJS                            |
+| Frontend            | Angular 21, PrimeNG 21, Tailwind CSS 4, TypeScript 5.9, RxJS |
 | Testes              | xUnit, NSubstitute e Vitest                               |
 | Infraestrutura      | Docker e Docker Compose                                   |
 
@@ -294,6 +294,7 @@ O workflow de integração contínua em `.github/workflows/ci.yml` executa essas
 - Cálculos e validações essenciais permanecem no domínio e no backend; o frontend replica os cálculos apenas para feedback imediato.
 - Consultas de leitura usam `AsNoTracking`, enquanto os produtos usados em gravações permanecem rastreados pelo EF Core.
 - O frontend usa rotas lazy e serviços tipados, sem depender de uma URL externa fixa.
+- O layout responsivo usa exclusivamente utilitários do Tailwind CSS; PrimeNG fornece os componentes interativos e o tema Aura personalizado.
 - No deploy em container, Angular e API compartilham origem e porta; somente o SQL Server permanece como serviço separado e persistente.
 
 ## Fluxo de branches
@@ -307,6 +308,7 @@ O desenvolvimento foi organizado a partir de `developer`, com branches por etapa
 - `feat/documentacao-deploy`;
 - `feat/deploy-main`;
 - `feat/dominio-jeive`;
-- `feat/versionamento-release`.
+- `feat/versionamento-release`;
+- `feat/frontend-primeng-tailwind`.
 
 Cada etapa possui commit próprio em português e merge explícito em `developer`.
