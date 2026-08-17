@@ -32,6 +32,7 @@ export class UiTableComponent {
   @Input() rows = 10;
   @Input() totalRecords = 0;
   @Input() rowsPerPageOptions: number[] = [5, 10, 20];
+  @Input() paginatorAppendTo: 'body' | HTMLElement = 'body';
   @Input() currentPageReportTemplate = 'Mostrando {first} a {last} de {totalRecords} registros';
   @Output() pageChange = new EventEmitter<UiPageChange>();
 }
