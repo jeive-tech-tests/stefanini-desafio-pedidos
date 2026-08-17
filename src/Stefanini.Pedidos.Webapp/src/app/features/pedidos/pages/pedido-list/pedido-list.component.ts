@@ -231,11 +231,6 @@ export class PedidoListComponent implements OnInit {
     return pedido.itensPedido.reduce((total, item) => total + item.quantidade, 0);
   }
 
-  protected percentual(quantidade: number): number {
-    const totalPedidos = this.sumario().totalPedidos;
-    return totalPedidos === 0 ? 0 : Math.round((quantidade / totalPedidos) * 100);
-  }
-
   protected imagemProduto(idProduto: number): string {
     return this.produtos().find((produto) => produto.id === idProduto)?.imagemUrl ?? '';
   }
