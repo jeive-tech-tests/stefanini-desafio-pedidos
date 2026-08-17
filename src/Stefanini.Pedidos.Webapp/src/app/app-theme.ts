@@ -16,5 +16,23 @@ export const AppTheme = definePreset(Aura, {
       900: '{blue.900}',
       950: '{blue.950}',
     },
+    colorScheme: {
+      dark: {
+        surface: {
+          0: '#ffffff',
+          50: '#f3f7ff',
+          100: '#e5edff',
+          200: '#cbdafb',
+          300: '#a8bee9',
+          400: '#7899d0',
+          500: '#5277b2',
+          600: '#38598f',
+          700: '#263f69',
+          800: '#172b4d',
+          900: '#0d1d38',
+          950: '#061127',
+        },
+      },
+    },
   },
 });
