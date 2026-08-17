@@ -1,0 +1,151 @@
+@if (erro()) {
+  <p-message class="mb-5 block" severity="error">{{ erro() }}</p-message>
+}
+<form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+  <div class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+    <div class="grid gap-5">
+      <section
+        class="rounded-2xl border border-slate-200 bg-white p-5 shadow-panel sm:p-7 dark:border-slate-800 dark:bg-slate-900"
+      >
+        <header class="mb-6 flex items-start gap-3">
+          <span
+            class="grid size-10 place-items-center rounded-xl bg-blue-50 font-bold text-blue-600"
+            >01</span
+          >
+          <div>
+            <h2 class="font-bold text-slate-950 dark:text-white">Dados do cliente</h2>
+            <p class="mt-1 text-sm text-slate-500">Identificação e contato vinculados ao pedido.</p>
+          </div>
+        </header>
+        <div class="grid gap-5 md:grid-cols-2">
+          <label
+            ><span class="mb-2 block text-sm font-semibold">Nome completo *</span
+            ><input
+              pInputText
+              class="w-full"
+              formControlName="nomeCliente"
+              placeholder="Ex.: Maria da Silva"
+              maxlength="60"
+              [invalid]="form.controls.nomeCliente.touched && form.controls.nomeCliente.invalid"
+            />
+            @if (form.controls.nomeCliente.touched && form.controls.nomeCliente.invalid) {
+              <small class="mt-1.5 block text-xs text-red-500"
+                >Informe um nome com até 60 caracteres.</small
+              >
+            }
+          </label>
+          <label
+            ><span class="mb-2 block text-sm font-semibold">E-mail *</span
+            ><input
+              pInputText
+              class="w-full"
+              type="email"
+              formControlName="emailCliente"
+              placeholder="cliente@email.com"
+              maxlength="60"
+              [invalid]="form.controls.emailCliente.touched && form.controls.emailCliente.invalid"
+            />
+            @if (form.controls.emailCliente.touched && form.controls.emailCliente.invalid) {
+              <small class="mt-1.5 block text-xs text-red-500">Informe um e-mail válido.</small>
+            }
+          </label>
+        </div>
+      </section>
+      <section
+        class="rounded-2xl border border-slate-200 bg-white p-5 shadow-panel sm:p-7 dark:border-slate-800 dark:bg-slate-900"
+      >
+        <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="flex gap-3">
+            <span
+              class="grid size-10 place-items-center rounded-xl bg-blue-50 font-bold text-blue-600"
+              >02</span
+            >
+            <div>
+              <h2 class="font-bold text-slate-950 dark:text-white">Itens do pedido</h2>
+              <p class="mt-1 text-sm text-slate-500">Adicione produtos e quantidades.</p>
+            </div>
+          </div>
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            (click)="adicionarItem()"
+          >
+            <i class="pi pi-plus"></i><span>Adicionar produto</span>
+          </button>
+        </header>
+        <div
+          class="hidden grid-cols-[minmax(220px,1fr)_130px_120px_140px_44px] gap-3 border-b border-slate-200 px-3 pb-3 text-xs font-bold uppercase text-slate-500 lg:grid"
+        >
+          <span>Produto</span><span>Valor unitário</span><span>Quantidade</span
+          ><span class="text-right">Subtotal</span><span></span>
+        </div>
+        <div formArrayName="itensPedido" class="mt-3 grid gap-3">
+          @for (item of itens.controls; track item; let index = $index) {
+            <app-pedido-item-form
+              [group]="item"
+              [produtos]="produtos"
+              [index]="index"
+              (remove)="removerItem(index)"
+            />
+          }
+        </div>
+      </section>
+    </div>
+    <aside
+      class="rounded-2xl border border-slate-200 bg-white p-6 shadow-panel xl:sticky xl:top-28 dark:border-slate-800 dark:bg-slate-900"
+    >
+      <span class="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">Resumo</span>
+      <h2 class="mt-2 text-xl font-bold text-slate-950 dark:text-white">
+        {{ pedido ? 'Pedido #' + pedido.id : 'Novo pedido' }}
+      </h2>
+      <dl class="mt-5 divide-y divide-slate-200 text-sm">
+        <div class="flex justify-between py-3">
+          <dt>Produtos</dt>
+          <dd class="font-bold">{{ itens.length }}</dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt>Unidades</dt>
+          <dd class="font-bold">{{ totalUnidades() }}</dd>
+        </div>
+      </dl>
+      <div
+        class="my-5 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-500 p-5 text-white shadow-lg"
+      >
+        <span class="text-xs font-semibold uppercase">Total estimado</span
+        ><strong class="mt-2 block text-3xl">{{
+          totalEstimado() | currency: 'BRL' : 'symbol' : '1.2-2'
+        }}</strong>
+      </div>
+      <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4"
+        ><p-toggleswitch formControlName="pago" ariaLabel="Pedido pago" /><span
+          ><strong class="block text-sm">Pedido pago</strong
+          ><small class="text-xs text-slate-500">Marque se o pagamento foi confirmado.</small></span
+        ></label
+      >
+      <div class="mt-5 grid gap-2">
+        <button
+          pButton
+          type="submit"
+          class="w-full justify-center"
+          [loading]="salvando"
+          [disabled]="salvando"
+        >
+          <i class="pi pi-check"></i
+          ><span>{{ pedido ? 'Salvar alterações' : 'Criar pedido' }}</span></button
+        ><button
+          pButton
+          type="button"
+          severity="secondary"
+          [outlined]="true"
+          class="w-full justify-center"
+          (click)="cancelled.emit()"
+        >
+          Cancelar
+        </button>
+      </div>
+    </aside>
+  </div>
+</form>

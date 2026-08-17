@@ -1,0 +1,320 @@
+<section class="mx-auto w-full max-w-[1540px] px-4 py-7 sm:px-6 sm:py-9 lg:px-10">
+  <p-confirmdialog />
+
+  <header class="mb-7 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl dark:text-white">
+        Pedidos
+      </h1>
+      <p class="mt-2 text-sm text-slate-500 sm:text-base dark:text-slate-400">
+        Acompanhe os pedidos, pagamentos e valores em uma visão simples e objetiva.
+      </p>
+    </div>
+
+    <a
+      pButton
+      routerLink="/pedidos/novo"
+      class="w-full justify-center shadow-lg shadow-blue-600/20 sm:w-auto"
+    >
+      <i class="pi pi-plus" aria-hidden="true"></i>
+      <span>Novo pedido</span>
+    </a>
+  </header>
+
+  @if (erro()) {
+    <div
+      class="mb-5 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
+      role="alert"
+    >
+      <span class="flex items-center gap-2"
+        ><i class="pi pi-exclamation-circle"></i>{{ erro() }}</span
+      >
+      <button pButton type="button" severity="danger" [text]="true" (click)="carregar()">
+        Tentar novamente
+      </button>
+    </div>
+  }
+
+  <section
+    class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+    aria-label="Resumo da página atual"
+  >
+    <article
+      class="flex min-h-32 items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-panel dark:border-slate-800 dark:bg-slate-900"
+    >
+      <span
+        class="grid size-14 shrink-0 place-items-center rounded-2xl bg-blue-50 text-2xl text-blue-600 dark:bg-blue-950/60 dark:text-blue-400"
+      >
+        <i class="pi pi-shopping-bag" aria-hidden="true"></i>
+      </span>
+      <div>
+        <span class="text-sm font-semibold text-slate-500 dark:text-slate-400"
+          >Total de pedidos</span
+        >
+        <strong class="mt-1 block text-2xl font-bold text-slate-950 dark:text-white">{{
+          totalItens()
+        }}</strong>
+        <small class="mt-1 block text-xs text-blue-600 dark:text-blue-400"
+          >{{ pedidos().length }} nesta página</small
+        >
+      </div>
+    </article>
+
+    <article
+      class="flex min-h-32 items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-panel dark:border-slate-800 dark:bg-slate-900"
+    >
+      <span
+        class="grid size-14 shrink-0 place-items-center rounded-2xl bg-indigo-50 text-2xl text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400"
+      >
+        <i class="pi pi-dollar" aria-hidden="true"></i>
+      </span>
+      <div>
+        <span class="text-sm font-semibold text-slate-500 dark:text-slate-400"
+          >Valor da página</span
+        >
+        <strong class="mt-1 block text-2xl font-bold text-slate-950 dark:text-white">
+          {{ valorTotalPagina() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        </strong>
+        <small class="mt-1 block text-xs text-slate-500 dark:text-slate-400"
+          >Soma dos pedidos exibidos</small
+        >
+      </div>
+    </article>
+
+    <article
+      class="flex min-h-32 items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-panel dark:border-slate-800 dark:bg-slate-900"
+    >
+      <span
+        class="grid size-14 shrink-0 place-items-center rounded-2xl bg-emerald-50 text-2xl text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400"
+      >
+        <i class="pi pi-credit-card" aria-hidden="true"></i>
+      </span>
+      <div>
+        <span class="text-sm font-semibold text-slate-500 dark:text-slate-400">Pedidos pagos</span>
+        <strong class="mt-1 block text-2xl font-bold text-slate-950 dark:text-white">{{
+          pagosPagina()
+        }}</strong>
+        <small class="mt-1 block text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          {{ percentual(pagosPagina()) }}% da página
+        </small>
+      </div>
+    </article>
+
+    <article
+      class="flex min-h-32 items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-panel dark:border-slate-800 dark:bg-slate-900"
+    >
+      <span
+        class="grid size-14 shrink-0 place-items-center rounded-2xl bg-orange-50 text-2xl text-orange-600 dark:bg-orange-950/60 dark:text-orange-400"
+      >
+        <i class="pi pi-clock" aria-hidden="true"></i>
+      </span>
+      <div>
+        <span class="text-sm font-semibold text-slate-500 dark:text-slate-400"
+          >Pedidos pendentes</span
+        >
+        <strong class="mt-1 block text-2xl font-bold text-slate-950 dark:text-white">{{
+          pendentesPagina()
+        }}</strong>
+        <small class="mt-1 block text-xs font-semibold text-orange-600 dark:text-orange-400">
+          {{ percentual(pendentesPagina()) }}% da página
+        </small>
+      </div>
+    </article>
+  </section>
+
+  <section
+    class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-panel dark:border-slate-800 dark:bg-slate-900"
+    [attr.aria-busy]="carregando()"
+  >
+    <form
+      class="grid grid-cols-1 gap-4 border-b border-slate-200 p-5 md:grid-cols-[minmax(260px,1.25fr)_minmax(220px,.8fr)_auto] md:items-end lg:p-6 dark:border-slate-800"
+      [formGroup]="filtros"
+      aria-label="Filtros de pedidos"
+    >
+      <label class="block">
+        <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200"
+          >Cliente</span
+        >
+        <span class="relative block">
+          <i
+            class="pi pi-search absolute left-3 top-1/2 z-10 -translate-y-1/2 text-slate-400"
+            aria-hidden="true"
+          ></i>
+          <input
+            pInputText
+            class="w-full pl-10"
+            type="search"
+            formControlName="nomeCliente"
+            placeholder="Buscar por cliente..."
+            autocomplete="off"
+          />
+        </span>
+      </label>
+
+      <label class="block">
+        <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200"
+          >Status (Pago)</span
+        >
+        <p-select
+          class="w-full"
+          formControlName="status"
+          [options]="statusOpcoes"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+        />
+      </label>
+
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        class="w-full justify-center md:w-auto"
+        (click)="limparFiltros()"
+      >
+        <i class="pi pi-filter-slash" aria-hidden="true"></i>
+        <span>Limpar filtros</span>
+      </button>
+    </form>
+
+    @if (carregando()) {
+      <app-loading label="Carregando pedidos..." />
+    } @else if (pedidos().length === 0) {
+      <app-empty-state
+        title="Nenhum pedido encontrado"
+        description="Ajuste os filtros ou cadastre o primeiro pedido."
+        ><a pButton routerLink="/pedidos/novo"
+          ><i class="pi pi-plus"></i><span>Criar pedido</span></a
+        ></app-empty-state
+      >
+    } @else {
+      <p-table
+        [value]="pedidos()"
+        dataKey="id"
+        responsiveLayout="stack"
+        breakpoint="960px"
+        styleClass="text-sm"
+      >
+        <ng-template #header>
+          <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Itens</th>
+            <th>Pago</th>
+            <th>Valor total</th>
+            <th class="text-right">Ações</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-pedido>
+          <tr>
+            <td>
+              <span class="mb-1 block text-xs font-semibold text-slate-500 lg:hidden">Pedido</span>
+              <div>
+                <strong class="font-bold text-slate-950 dark:text-white">#{{ pedido.id }}</strong>
+                <small class="mt-1 block text-xs text-slate-500 dark:text-slate-400"
+                  >ID: {{ pedido.id }}</small
+                >
+              </div>
+            </td>
+            <td>
+              <span class="mb-1 block text-xs font-semibold text-slate-500 lg:hidden">Cliente</span>
+              <div>
+                <strong class="font-semibold text-slate-950 dark:text-white">{{
+                  pedido.nomeCliente
+                }}</strong>
+                <small class="mt-1 block text-xs text-slate-500 dark:text-slate-400">{{
+                  pedido.emailCliente
+                }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="mb-1 block text-xs font-semibold text-slate-500 lg:hidden">Itens</span>
+              <div>
+                <strong class="font-semibold text-slate-950 dark:text-white"
+                  >{{ totalUnidades(pedido) }} itens</strong
+                >
+                <small
+                  class="mt-1 block max-w-64 truncate text-xs text-slate-500 dark:text-slate-400"
+                >
+                  @for (item of pedido.itensPedido.slice(0, 2); track item.id; let ultimo = $last) {
+                    {{ item.quantidade }}× {{ item.nomeProduto }}{{ ultimo ? '' : ', ' }}
+                  }
+                  @if (pedido.itensPedido.length > 2) {
+                    +{{ pedido.itensPedido.length - 2 }} produto(s)
+                  }
+                </small>
+              </div>
+            </td>
+            <td>
+              <span class="mb-1 block text-xs font-semibold text-slate-500 lg:hidden">Pago</span>
+              <p-tag
+                [severity]="pedido.pago ? 'success' : 'warn'"
+                [value]="pedido.pago ? 'Pago' : 'Pendente'"
+                [icon]="pedido.pago ? 'pi pi-check-circle' : 'pi pi-clock'"
+                [rounded]="true"
+              />
+            </td>
+            <td>
+              <span class="mb-1 block text-xs font-semibold text-slate-500 lg:hidden"
+                >Valor total</span
+              >
+              <strong class="font-bold text-slate-950 dark:text-white">
+                {{ pedido.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </strong>
+            </td>
+            <td>
+              <span class="mb-1 block text-xs font-semibold text-slate-500 lg:hidden">Ações</span>
+              <div class="flex justify-end gap-1">
+                <a
+                  pButton
+                  severity="secondary"
+                  [text]="true"
+                  [rounded]="true"
+                  icon="pi pi-eye"
+                  [routerLink]="['/pedidos', pedido.id]"
+                  [attr.aria-label]="'Ver pedido ' + pedido.id"
+                  pTooltip="Detalhes"
+                ></a>
+                <a
+                  pButton
+                  severity="secondary"
+                  [outlined]="true"
+                  [rounded]="true"
+                  icon="pi pi-pencil"
+                  [routerLink]="['/pedidos', pedido.id, 'editar']"
+                  [attr.aria-label]="'Editar pedido ' + pedido.id"
+                  pTooltip="Editar"
+                  tooltipPosition="top"
+                ></a>
+                <button
+                  pButton
+                  type="button"
+                  severity="danger"
+                  [text]="true"
+                  [rounded]="true"
+                  icon="pi pi-trash"
+                  [loading]="removendoId() === pedido.id"
+                  (click)="remover(pedido)"
+                  [attr.aria-label]="'Excluir pedido ' + pedido.id"
+                  pTooltip="Excluir"
+                  tooltipPosition="top"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <p-paginator
+        [first]="(pagina() - 1) * tamanhoPagina()"
+        [rows]="tamanhoPagina()"
+        [totalRecords]="totalItens()"
+        [rowsPerPageOptions]="[5, 8, 10, 20]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} pedidos"
+        (onPageChange)="alterarPagina($event)"
+      />
+    }
+  </section>
+</section>

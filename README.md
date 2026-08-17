@@ -47,7 +47,17 @@ As dependências apontam para o centro da aplicação:
 - **Application** contém casos de uso, contratos, DTOs e serviços;
 - **Infrastructure** implementa persistência com EF Core e SQL Server;
 - **Api** expõe endpoints REST, Swagger e tratamento global de erros;
-- **frontend** entrega a experiência de listagem e manutenção dos pedidos.
+- **Webapp** entrega a experiência de listagem e manutenção dos pedidos com organização feature-first.
+
+No Angular, `core` concentra configuração transversal, interceptadores e notificações; `layout` contém o shell visual; `shared` reúne somente componentes realmente reutilizáveis; e `features/pedidos` mantém páginas, componentes, modelos e serviços do domínio de pedidos próximos entre si. As rotas da feature são carregadas sob demanda, e criação e edição compartilham o mesmo formulário reativo com `FormArray` para os itens.
+
+```text
+src/Stefanini.Pedidos.Webapp/src/app/
+├── core/                  # configuração, interceptor e notificações
+├── layout/                # header e shell da aplicação
+├── shared/                # page-header, loading, empty-state e utilitários
+└── features/pedidos/      # componentes, páginas, modelos, rotas e serviços HTTP
+```
 
 ## Executar tudo com Docker
 
@@ -154,7 +164,7 @@ Server=localhost,1433;Database=StefaniniPedidos;User Id=sa;Password=Pedidos@2026
 Pré-requisito: Node.js 24 com npm.
 
 ```bash
-cd frontend
+cd src/Stefanini.Pedidos.Webapp
 npm ci
 npm start
 ```
@@ -279,7 +289,7 @@ dotnet list Stefanini.Pedidos.sln package --vulnerable --include-transitive
 Frontend:
 
 ```bash
-cd frontend
+cd src/Stefanini.Pedidos.Webapp
 npm run format:check
 npm run test:ci
 npm run build
