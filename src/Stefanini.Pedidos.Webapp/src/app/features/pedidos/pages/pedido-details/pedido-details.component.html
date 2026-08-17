@@ -70,21 +70,6 @@
         <strong class="mt-2 block whitespace-nowrap text-3xl text-slate-950 dark:text-white">
           {{ order.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
         </strong>
-        <app-ui-button
-          label="Editar pedido"
-          icon="pi pi-pencil"
-          buttonClass="mt-6"
-          [fluid]="true"
-          [routerLink]="['/pedidos', order.id, 'editar']"
-        />
-        <app-ui-button
-          label="Fechar"
-          severity="secondary"
-          buttonClass="mt-3"
-          [outlined]="true"
-          [fluid]="true"
-          (clicked)="fechar()"
-        />
       </app-ui-card>
     </div>
   }

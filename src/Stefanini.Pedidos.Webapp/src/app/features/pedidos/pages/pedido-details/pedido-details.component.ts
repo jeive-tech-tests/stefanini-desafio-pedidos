@@ -8,10 +8,9 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
-import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
 import { UiModalComponent } from '../../../../shared/components/ui-modal/ui-modal.component';
 import { UiProductImageComponent } from '../../../../shared/components/ui-product-image/ui-product-image.component';
@@ -26,8 +25,6 @@ import { Produto } from '../../models/produto.model';
   imports: [
     CurrencyPipe,
     UiLoadingComponent,
-    RouterLink,
-    UiButtonComponent,
     UiCardComponent,
     UiModalComponent,
     UiProductImageComponent,

@@ -26,7 +26,6 @@ interface PedidoListHarness {
   alterarPagina(evento: { page?: number; rows?: number }): void;
   remover(pedido: Pedido): void;
   totalUnidades(pedido: Pedido): number;
-  percentual(quantidade: number): number;
   imagemProduto(idProduto: number): string;
 }
 
@@ -111,7 +110,6 @@ describe('PedidoListComponent', () => {
       pedidosPendentes: 18,
     });
     expect(component.totalUnidades(pedido)).toBe(2);
-    expect(component.percentual(32)).toBe(64);
     expect(component.imagemProduto(1)).toBe('/api/produtos/1/imagem');
     expect(obterSumario).toHaveBeenCalledTimes(1);
   });
