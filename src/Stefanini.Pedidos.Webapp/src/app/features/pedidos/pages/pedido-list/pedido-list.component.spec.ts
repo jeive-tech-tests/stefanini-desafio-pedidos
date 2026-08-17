@@ -4,7 +4,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { UiConfirmationService } from '../../../../shared/components/ui-confirm-dialog/ui-confirm-dialog.component';
 import { Pedido } from '../../models/pedido.model';
@@ -61,6 +61,8 @@ describe('PedidoListComponent', () => {
   const notificarSucesso = vi.fn();
   const confirmar = vi.fn();
 
+  afterEach(() => vi.useRealTimers());
+
   beforeEach(async () => {
     listarPedidos
       .mockReset()
@@ -111,6 +113,49 @@ describe('PedidoListComponent', () => {
     expect(component.pagina()).toBe(2);
     expect(component.tamanhoPagina()).toBe(20);
     expect(listarPedidos).toHaveBeenLastCalledWith({ pagina: 2, tamanhoPagina: 20 });
+  });
+
+  it('aguarda o fim da digitação antes de pesquisar pelo cliente', async () => {
+    vi.useFakeTimers();
+    const fixture = TestBed.createComponent(PedidoListComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance as unknown as PedidoListHarness;
+
+    component.filtros.get('nomeCliente')!.setValue('c');
+    component.filtros.get('nomeCliente')!.setValue('cl');
+    component.filtros.get('nomeCliente')!.setValue('cliente');
+
+    expect(listarPedidos).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(499);
+    expect(listarPedidos).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(listarPedidos).toHaveBeenCalledTimes(2);
+    expect(listarPedidos).toHaveBeenLastCalledWith({
+      pagina: 1,
+      tamanhoPagina: 8,
+      nomeCliente: 'cliente',
+    });
+  });
+
+  it('cancela uma listagem anterior ao iniciar uma nova consulta', () => {
+    let consultaAnteriorCancelada = false;
+    listarPedidos
+      .mockReturnValueOnce(
+        new Observable(() => () => {
+          consultaAnteriorCancelada = true;
+        }),
+      )
+      .mockReturnValueOnce(
+        of({ itens: [pedido], pagina: 2, tamanhoPagina: 20, totalItens: 1, totalPaginas: 1 }),
+      );
+    const fixture = TestBed.createComponent(PedidoListComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance as unknown as PedidoListHarness;
+
+    component.alterarPagina({ page: 1, rows: 20 });
+
+    expect(consultaAnteriorCancelada).toBe(true);
+    expect(listarPedidos).toHaveBeenCalledTimes(2);
   });
 
   it('confirma, remove e recarrega um pedido', () => {

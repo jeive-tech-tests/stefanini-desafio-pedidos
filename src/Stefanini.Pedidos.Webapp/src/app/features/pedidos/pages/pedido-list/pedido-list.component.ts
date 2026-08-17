@@ -11,7 +11,18 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { debounceTime, finalize } from 'rxjs';
+import {
+  EMPTY,
+  Subject,
+  catchError,
+  debounceTime,
+  defer,
+  distinctUntilChanged,
+  finalize,
+  map,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { mensagemErroHttp } from '../../../../shared/utils/http-error';
 import { UiEmptyStateComponent } from '../../../../shared/components/ui-empty-state/ui-empty-state.component';
@@ -37,6 +48,7 @@ import { ProdutoService } from '../../services/produto.service';
 import { Produto } from '../../models/produto.model';
 
 type StatusFiltro = 'todos' | 'pago' | 'pendente';
+const TEMPO_ESPERA_FILTRO_MS = 500;
 
 @Component({
   selector: 'app-pedido-list',
@@ -64,6 +76,7 @@ export class PedidoListComponent implements OnInit {
   private readonly notifications = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly confirmationService = inject(UiConfirmationService);
+  private readonly recarregarPedidos$ = new Subject<void>();
 
   protected readonly pedidos = signal<Pedido[]>([]);
   protected readonly produtos = signal<Produto[]>([]);
@@ -104,8 +117,44 @@ export class PedidoListComponent implements OnInit {
         error: () => undefined,
       });
 
+    this.recarregarPedidos$
+      .pipe(
+        switchMap(() =>
+          defer(() => {
+            this.carregando.set(true);
+            this.erro.set(null);
+
+            return this.pedidosService.listar(this.criarFiltro()).pipe(
+              tap((resultado) => {
+                this.pedidos.set(resultado.itens);
+                this.totalItens.set(resultado.totalItens);
+                this.totalPaginas.set(resultado.totalPaginas);
+              }),
+              catchError((error: unknown) => {
+                this.erro.set(mensagemErroHttp(error));
+                return EMPTY;
+              }),
+              finalize(() => this.carregando.set(false)),
+            );
+          }),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+
     this.filtros.valueChanges
-      .pipe(debounceTime(350), takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        map((filtros) => ({
+          nomeCliente: filtros.nomeCliente?.trim() ?? '',
+          status: filtros.status ?? 'todos',
+        })),
+        debounceTime(TEMPO_ESPERA_FILTRO_MS),
+        distinctUntilChanged(
+          (anterior, atual) =>
+            anterior.nomeCliente === atual.nomeCliente && anterior.status === atual.status,
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe(() => {
         this.pagina.set(1);
         this.carregar();
@@ -115,32 +164,18 @@ export class PedidoListComponent implements OnInit {
   }
 
   protected carregar(): void {
-    this.carregando.set(true);
-    this.erro.set(null);
+    this.recarregarPedidos$.next();
+  }
 
+  private criarFiltro(): PedidosQuery {
     const status = this.filtros.controls.status.value;
     const nomeCliente = this.filtros.controls.nomeCliente.value.trim();
-    const filtro: PedidosQuery = {
+    return {
       pagina: this.pagina(),
       tamanhoPagina: this.tamanhoPagina(),
       ...(nomeCliente ? { nomeCliente } : {}),
       ...(status !== 'todos' ? { pago: status === 'pago' } : {}),
     };
-
-    this.pedidosService
-      .listar(filtro)
-      .pipe(
-        finalize(() => this.carregando.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (resultado) => {
-          this.pedidos.set(resultado.itens);
-          this.totalItens.set(resultado.totalItens);
-          this.totalPaginas.set(resultado.totalPaginas);
-        },
-        error: (error: unknown) => this.erro.set(mensagemErroHttp(error)),
-      });
   }
 
   protected limparFiltros(): void {
