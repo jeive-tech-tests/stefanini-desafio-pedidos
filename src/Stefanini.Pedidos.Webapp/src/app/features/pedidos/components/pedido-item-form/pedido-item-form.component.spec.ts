@@ -39,6 +39,7 @@ describe('PedidoItemFormComponent', () => {
     expect(component.selectedProduct).toBe(produto);
     expect(component.unitPrice).toBe(25);
     expect(component.subtotal).toBe(100);
+    expect(fixture.nativeElement.querySelector('app-ui-product-image button')).toBeNull();
   });
 
   it('retorna valores zerados quando nenhum produto está selecionado', () => {

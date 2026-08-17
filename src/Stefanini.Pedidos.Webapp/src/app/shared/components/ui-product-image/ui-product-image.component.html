@@ -1,25 +1,40 @@
-<button
-  type="button"
-  class="group grid shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white bg-blue-100 shadow-sm outline-none transition hover:z-10 hover:scale-110 focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-[#0d1d38] dark:bg-blue-950"
-  [class.size-8]="size === 'sm'"
-  [class.size-11]="size === 'md'"
-  [class.size-14]="size === 'lg'"
-  [attr.aria-label]="'Ampliar imagem de ' + alt"
-  (mouseenter)="showPreview($event, preview)"
-  (mouseleave)="preview.hide()"
-  (focus)="showPreview($event, preview)"
-  (blur)="preview.hide()"
->
+@if (previewEnabled) {
+  <button
+    type="button"
+    class="group grid shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white bg-blue-100 shadow-sm outline-none transition hover:z-10 hover:scale-110 focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-[#0d1d38] dark:bg-blue-950"
+    [class.size-8]="size === 'sm'"
+    [class.size-11]="size === 'md'"
+    [class.size-14]="size === 'lg'"
+    [attr.aria-label]="'Ampliar imagem de ' + alt"
+    (mouseenter)="showPreview($event, preview)"
+    (mouseleave)="preview.hide()"
+    (focus)="showPreview($event, preview)"
+    (blur)="preview.hide()"
+  >
+    <ng-container [ngTemplateOutlet]="imageContent" />
+  </button>
+
+  <p-popover #preview appendTo="body" styleClass="overflow-hidden rounded-2xl shadow-2xl">
+    <figure class="w-56 p-2">
+      <img class="aspect-square w-full rounded-xl object-cover" [src]="src" [alt]="alt" />
+      <figcaption class="px-2 pb-1 pt-3 text-center text-sm font-semibold">{{ alt }}</figcaption>
+    </figure>
+  </p-popover>
+} @else {
+  <span
+    class="grid shrink-0 place-items-center overflow-hidden rounded-full border-2 border-white bg-blue-100 shadow-sm dark:border-[#0d1d38] dark:bg-blue-950"
+    [class.size-8]="size === 'sm'"
+    [class.size-11]="size === 'md'"
+    [class.size-14]="size === 'lg'"
+  >
+    <ng-container [ngTemplateOutlet]="imageContent" />
+  </span>
+}
+
+<ng-template #imageContent>
   @if (failed()) {
     <i class="pi pi-image text-blue-500" aria-hidden="true"></i>
   } @else {
     <img class="size-full object-cover" [src]="src" [alt]="alt" (error)="failed.set(true)" />
   }
-</button>
-
-<p-popover #preview appendTo="body" styleClass="overflow-hidden rounded-2xl shadow-2xl">
-  <figure class="w-56 p-2">
-    <img class="aspect-square w-full rounded-xl object-cover" [src]="src" [alt]="alt" />
-    <figcaption class="px-2 pb-1 pt-3 text-center text-sm font-semibold">{{ alt }}</figcaption>
-  </figure>
-</p-popover>
+</ng-template>

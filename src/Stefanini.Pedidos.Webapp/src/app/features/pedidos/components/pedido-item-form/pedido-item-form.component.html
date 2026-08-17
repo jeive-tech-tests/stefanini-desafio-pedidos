@@ -6,7 +6,12 @@
     ><span class="mb-2 block text-xs font-semibold text-slate-500 xl:hidden">Produto</span>
     <div class="flex items-center gap-2">
       @if (selectedProduct; as product) {
-        <app-ui-product-image [src]="product.imagemUrl" [alt]="product.nomeProduto" size="sm" />
+        <app-ui-product-image
+          [src]="product.imagemUrl"
+          [alt]="product.nomeProduto"
+          size="sm"
+          [previewEnabled]="false"
+        />
       }
       <app-ui-select
         class="min-w-0 flex-1"
