@@ -2,8 +2,8 @@
   <app-ui-message class="mb-5" severity="error">{{ erro() }}</app-ui-message>
 }
 <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
-  <div class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-    <div class="grid gap-5">
+  <div class="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
+    <div class="grid min-w-0 gap-5">
       <app-ui-card padding="lg">
         <header class="mb-6 flex items-start gap-3">
           <span
@@ -64,11 +64,13 @@
             icon="pi pi-plus"
             severity="secondary"
             [outlined]="true"
+            [disabled]="!podeAdicionarItem()"
+            [tooltip]="podeAdicionarItem() ? undefined : 'Todos os produtos já foram adicionados.'"
             (clicked)="adicionarItem()"
           />
         </header>
         <div
-          class="hidden grid-cols-[minmax(220px,1fr)_130px_120px_140px_44px] gap-3 border-b border-slate-200 px-3 pb-3 text-xs font-bold uppercase text-slate-500 lg:grid"
+          class="hidden grid-cols-[minmax(0,1fr)_110px_150px_130px_40px] gap-3 border-b border-slate-200 px-3 pb-3 text-xs font-bold uppercase text-slate-500 xl:grid"
         >
           <span>Produto</span><span>Valor unitário</span><span>Quantidade</span
           ><span class="text-right">Subtotal</span><span></span>
@@ -77,7 +79,7 @@
           @for (item of itens.controls; track item; let index = $index) {
             <app-pedido-item-form
               [group]="item"
-              [produtos]="produtos"
+              [produtos]="produtosDisponiveis(index)"
               [index]="index"
               (remove)="removerItem(index)"
             />

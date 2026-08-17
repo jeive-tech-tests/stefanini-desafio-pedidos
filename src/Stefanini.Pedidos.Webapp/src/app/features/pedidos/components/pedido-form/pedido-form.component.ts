@@ -79,9 +79,11 @@ export class PedidoFormComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['pedido'] && this.pedido) this.preencherPedido(this.pedido);
+    if (changes['produtos']) this.recalcularTotal();
   }
 
   protected adicionarItem(idProduto: number | null = null, quantidade = 1): void {
+    if (this.produtos.length > 0 && this.itens.length >= this.produtos.length) return;
     this.itens.push(createPedidoItemForm(idProduto, quantidade));
     this.recalcularTotal();
   }
@@ -98,6 +100,24 @@ export class PedidoFormComponent implements OnInit, OnChanges {
 
   protected totalUnidades(): number {
     return this.itens.getRawValue().reduce((sum, item) => sum + item.quantidade, 0);
+  }
+
+  protected podeAdicionarItem(): boolean {
+    return this.itens.length < this.produtos.length;
+  }
+
+  protected produtosDisponiveis(index: number): Produto[] {
+    const produtoAtual = this.itens.at(index).controls.idProduto.value;
+    const produtosSelecionados = new Set(
+      this.itens.controls
+        .filter((_, itemIndex) => itemIndex !== index)
+        .map((item) => item.controls.idProduto.value)
+        .filter((id): id is number => id !== null),
+    );
+
+    return this.produtos.filter(
+      (produto) => produto.id === produtoAtual || !produtosSelecionados.has(produto.id),
+    );
   }
 
   protected salvar(): void {

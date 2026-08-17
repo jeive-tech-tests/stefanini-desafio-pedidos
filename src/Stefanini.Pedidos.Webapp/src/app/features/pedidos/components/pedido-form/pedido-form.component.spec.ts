@@ -13,6 +13,8 @@ interface PedidoFormHarness {
   totalEstimado: Signal<number>;
   adicionarItem(idProduto?: number | null, quantidade?: number): void;
   removerItem(index: number): void;
+  podeAdicionarItem(): boolean;
+  produtosDisponiveis(index: number): Produto[];
   salvar(): void;
 }
 
@@ -104,6 +106,31 @@ describe('PedidoFormComponent', () => {
 
     expect(emitted).not.toHaveBeenCalled();
     expect(component.erro()).toContain('apenas uma vez');
+  });
+
+  it('remove dos seletores os produtos usados em outros itens', () => {
+    const fixture = TestBed.createComponent(PedidoFormComponent);
+    fixture.componentInstance.produtos = produtos;
+    fixture.detectChanges();
+    const component = harness(fixture.componentInstance);
+    component.itens.at(0).controls.idProduto.setValue(1);
+    component.adicionarItem(2);
+
+    expect(component.produtosDisponiveis(0).map((produto) => produto.id)).toEqual([1]);
+    expect(component.produtosDisponiveis(1).map((produto) => produto.id)).toEqual([2]);
+  });
+
+  it('limita a quantidade de itens ao catálogo disponível', () => {
+    const fixture = TestBed.createComponent(PedidoFormComponent);
+    fixture.componentInstance.produtos = produtos;
+    fixture.detectChanges();
+    const component = harness(fixture.componentInstance);
+
+    expect(component.podeAdicionarItem()).toBe(true);
+    component.adicionarItem();
+    expect(component.podeAdicionarItem()).toBe(false);
+    component.adicionarItem();
+    expect(component.itens.length).toBe(2);
   });
 
   it('não permite remover o único item', () => {

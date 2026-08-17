@@ -13,7 +13,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
   selector: 'app-ui-input-number',
   imports: [FormsModule, InputNumberModule],
   templateUrl: './ui-input-number.component.html',
-  host: { class: 'block' },
+  host: { class: 'block min-w-0' },
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
