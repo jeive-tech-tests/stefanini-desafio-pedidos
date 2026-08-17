@@ -36,7 +36,9 @@ public sealed class PedidoRepository(PedidosDbContext context) : IPedidoReposito
 
         if (!string.IsNullOrWhiteSpace(nomeCliente))
         {
-            query = query.Where(pedido => pedido.NomeCliente.Contains(nomeCliente));
+            query = query.Where(pedido =>
+                pedido.NomeCliente.Contains(nomeCliente) ||
+                pedido.EmailCliente.Contains(nomeCliente));
         }
 
         if (idProduto.HasValue)
