@@ -8,14 +8,14 @@ public sealed class ItemPedido
     {
     }
 
-    public ItemPedido(int produtoId, decimal valorUnitario, int quantidade)
+    public ItemPedido(Produto produto, int quantidade)
     {
-        if (produtoId <= 0)
+        if (produto is null)
         {
             throw new DomainException("O produto informado é inválido.");
         }
 
-        if (valorUnitario <= 0)
+        if (produto.Valor <= 0)
         {
             throw new DomainException("O valor unitário deve ser maior que zero.");
         }
@@ -25,8 +25,9 @@ public sealed class ItemPedido
             throw new DomainException("A quantidade deve ser maior que zero.");
         }
 
-        ProdutoId = produtoId;
-        ValorUnitario = decimal.Round(valorUnitario, 2, MidpointRounding.AwayFromZero);
+        Produto = produto;
+        ProdutoId = produto.Id;
+        ValorUnitario = produto.Valor;
         Quantidade = quantidade;
     }
 
