@@ -1,5 +1,7 @@
 # Stefanini — Gestão de Pedidos
 
+[![Última versão](https://img.shields.io/github/v/release/jeive-tech-tests/stefanini-desafio-pedidos?display_name=tag&sort=semver)](https://github.com/jeive-tech-tests/stefanini-desafio-pedidos/releases/latest)
+
 Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD completo de pedidos, com API REST em .NET, interface responsiva em Angular, persistência em SQL Server, testes automatizados e execução integrada com Docker.
 
 ## Visão geral
@@ -18,15 +20,15 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 
 ## Tecnologias
 
-| Camada | Tecnologia |
-| --- | --- |
-| API | .NET 10, ASP.NET Core, Entity Framework Core |
-| Arquitetura | Clean Architecture, DDD tático, Repository e Unit of Work |
-| Banco de dados | SQL Server 2022 |
-| Documentação da API | Swagger/OpenAPI |
-| Frontend | Angular 22, TypeScript 6, RxJS |
-| Testes | xUnit, NSubstitute e Vitest |
-| Infraestrutura | Docker e Docker Compose |
+| Camada              | Tecnologia                                                |
+| ------------------- | --------------------------------------------------------- |
+| API                 | .NET 10, ASP.NET Core, Entity Framework Core              |
+| Arquitetura         | Clean Architecture, DDD tático, Repository e Unit of Work |
+| Banco de dados      | SQL Server 2022                                           |
+| Documentação da API | Swagger/OpenAPI                                           |
+| Frontend            | Angular 22, TypeScript 6, RxJS                            |
+| Testes              | xUnit, NSubstitute e Vitest                               |
+| Infraestrutura      | Docker e Docker Compose                                   |
 
 ## Arquitetura
 
@@ -105,6 +107,19 @@ O runner precisa possuir os rótulos `self-hosted`, `Linux`, `X64` e `deploy`. T
 
 O proxy reverso está versionado em `deploy/nginx/jeive.dev.conf`. O certificado TLS de `jeive.dev` e `www.jeive.dev` é emitido pelo Let's Encrypt e renovado pelo timer do Certbot no servidor.
 
+### Versionamento e releases
+
+Depois que o deploy da `main` termina com sucesso, o mesmo workflow publica automaticamente uma [GitHub Release](https://github.com/jeive-tech-tests/stefanini-desafio-pedidos/releases/latest) com versão no formato `v1.0.N`.
+
+Cada release contém:
+
+- notas geradas a partir das mudanças publicadas;
+- um pacote ZIP completo e identificado pela versão;
+- o checksum SHA-256 do pacote para validação da integridade;
+- referência exata ao commit implantado em produção.
+
+O contador `N` é o número incremental de execução do workflow de deploy. Uma reexecução do mesmo workflow é idempotente e não cria uma release duplicada.
+
 ## Desenvolvimento local
 
 ### Backend
@@ -148,14 +163,14 @@ Acesse <http://localhost:4200>. O proxy de desenvolvimento encaminha `/api` para
 
 ## Endpoints
 
-| Método | Rota | Descrição |
-| --- | --- | --- |
-| `POST` | `/api/pedidos` | cria um pedido |
-| `GET` | `/api/pedidos/{id}` | consulta um pedido por id |
-| `GET` | `/api/pedidos` | lista pedidos com filtros e paginação |
-| `PUT` | `/api/pedidos/{id}` | atualiza um pedido |
-| `DELETE` | `/api/pedidos/{id}` | exclui um pedido |
-| `GET` | `/api/produtos` | lista o catálogo de produtos |
+| Método   | Rota                | Descrição                             |
+| -------- | ------------------- | ------------------------------------- |
+| `POST`   | `/api/pedidos`      | cria um pedido                        |
+| `GET`    | `/api/pedidos/{id}` | consulta um pedido por id             |
+| `GET`    | `/api/pedidos`      | lista pedidos com filtros e paginação |
+| `PUT`    | `/api/pedidos/{id}` | atualiza um pedido                    |
+| `DELETE` | `/api/pedidos/{id}` | exclui um pedido                      |
+| `GET`    | `/api/produtos`     | lista o catálogo de produtos          |
 
 Parâmetros opcionais da listagem:
 
@@ -198,20 +213,20 @@ GET /api/pedidos?pagina=1&tamanhoPagina=10&nomeCliente=maria&pago=false
   "nomeCliente": "Maria da Silva",
   "emailCliente": "maria@email.com",
   "pago": false,
-  "valorTotal": 4559.70,
+  "valorTotal": 4559.7,
   "itensPedido": [
     {
       "id": 1,
       "idProduto": 1,
       "nomeProduto": "Notebook",
-      "valorUnitario": 4299.90,
+      "valorUnitario": 4299.9,
       "quantidade": 1
     },
     {
       "id": 2,
       "idProduto": 4,
       "nomeProduto": "Mouse",
-      "valorUnitario": 129.90,
+      "valorUnitario": 129.9,
       "quantidade": 2
     }
   ]
@@ -289,6 +304,9 @@ O desenvolvimento foi organizado a partir de `developer`, com branches por etapa
 - `feat/crud-pedidos`;
 - `feat/testes-backend`;
 - `feat/frontend-angular`;
-- `feat/documentacao-deploy`.
+- `feat/documentacao-deploy`;
+- `feat/deploy-main`;
+- `feat/dominio-jeive`;
+- `feat/versionamento-release`.
 
 Cada etapa possui commit próprio em português e merge explícito em `developer`.

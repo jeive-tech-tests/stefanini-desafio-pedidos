@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Obter código da main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           clean: true
 
@@ -67,3 +67,65 @@ jobs:
       - name: Remover arquivo temporário de segredo
         if: always()
         run: rm -f .env
+
+  release:
+    name: Publicar versão
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Obter código publicado
+        uses: actions/checkout@v6
+
+      - name: Definir versão
+        id: versao
+        shell: bash
+        run: echo "numero=1.0.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Empacotar código da versão
+        id: pacote
+        shell: bash
+        env:
+          VERSAO: ${{ steps.versao.outputs.numero }}
+        run: |
+          NOME="stefanini-desafio-pedidos-${VERSAO}.zip"
+          mkdir -p dist
+          git archive \
+            --format=zip \
+            --prefix="stefanini-desafio-pedidos-${VERSAO}/" \
+            --output="dist/${NOME}" \
+            "${GITHUB_SHA}"
+
+          (
+            cd dist
+            sha256sum "${NOME}" > "${NOME}.sha256"
+          )
+
+          echo "arquivo=dist/${NOME}" >> "$GITHUB_OUTPUT"
+
+      - name: Criar GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSAO: ${{ steps.versao.outputs.numero }}
+          PACOTE: ${{ steps.pacote.outputs.arquivo }}
+        run: |
+          TAG="v${VERSAO}"
+
+          if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "A release ${TAG} já existe; nenhuma duplicação será criada."
+            exit 0
+          fi
+
+          gh release create "${TAG}" \
+            "${PACOTE}" \
+            "${PACOTE}.sha256" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "Versão ${VERSAO}" \
+            --generate-notes \
+            --latest \
+            --notes "Deploy validado em https://jeive.dev/stefanini-desafio-pedidos/."
