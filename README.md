@@ -4,6 +4,25 @@
 
 Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD completo de pedidos, com API REST em .NET, interface responsiva em Angular, persistência em SQL Server, testes automatizados e execução integrada com Docker.
 
+## Aderência ao desafio técnico
+
+| Requisito do PDF                      | Implementação                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Projeto compilando                    | Builds independentes de .NET e Angular, além de imagem Docker multi-stage                  |
+| DDD, SOLID, Clean Code e REST         | Camadas Domain, Application, Infrastructure e Api, com contratos e injeção de dependências |
+| Criar e consultar pedido              | `POST /api/pedidos`, `GET /api/pedidos/{id}` e listagem paginada                           |
+| Testes do GET em controller e serviço | Suítes unitárias específicas e testes de integração HTTP                                   |
+| Migration SQL                         | Migrations versionadas e aplicadas automaticamente no container                            |
+| Swagger                               | OpenAPI e Swagger UI disponíveis em `/swagger`                                             |
+| JSON exigido                          | Resposta contém pedido, cliente, pagamento, `valorTotal` e itens com preço praticado       |
+| Erros e validações                    | `ProblemDetails` para 400, 404, 409 e 500, com validação de entrada                        |
+| CRUD completo                         | Criação, consulta, atualização e exclusão                                                  |
+| Paginação e filtros                   | Filtros combináveis por nome/e-mail, produto e pagamento                                   |
+| Frontend integrado                    | Angular responsivo com PrimeNG, Tailwind CSS e design system `ui-*`                        |
+| Publicação em cloud                   | Aplicação e API em `https://jeive.dev/stefanini-desafio-pedidos/`                          |
+| Banco no Docker Compose               | SQL Server persistente, acompanhado de MinIO para imagens dos produtos                     |
+| Design Patterns                       | Repository, Unit of Work, Dependency Injection e componentes reutilizáveis                 |
+
 ## Visão geral
 
 - criação, consulta, edição e exclusão de pedidos;
