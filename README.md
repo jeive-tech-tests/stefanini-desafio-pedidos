@@ -85,6 +85,22 @@ docker compose down
 
 > `docker compose down -v` também apaga definitivamente o banco local e deve ser usado somente quando essa for a intenção.
 
+## Deploy automatizado
+
+O workflow `.github/workflows/deploy.yml` publica automaticamente cada atualização da branch `main` no runner self-hosted de produção.
+
+Fluxo do deploy:
+
+1. o runner obtém exclusivamente o código da `main`;
+2. o secret `MSSQL_SA_PASSWORD` é gravado em um `.env` temporário com permissão restrita;
+3. o Docker Compose valida, compila e atualiza os containers;
+4. o workflow aguarda o endpoint `/health` responder com sucesso;
+5. o arquivo `.env` temporário é removido mesmo se o job falhar.
+
+O banco não é publicado na rede externa: a porta `1433` fica vinculada somente a `127.0.0.1`. A aplicação permanece disponível na porta `8080` do servidor.
+
+O runner precisa possuir os rótulos `self-hosted`, `Linux`, `X64` e `deploy`. Também é possível executar o workflow manualmente pela interface do GitHub, mas a validação do job impede deploy de qualquer referência diferente de `main`.
+
 ## Desenvolvimento local
 
 ### Backend

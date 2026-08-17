@@ -1,0 +1,69 @@
+name: Deploy em produção
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: producao
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publicar aplicação
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Linux, X64, deploy]
+    timeout-minutes: 30
+
+    steps:
+      - name: Obter código da main
+        uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Preparar configuração protegida
+        shell: bash
+        env:
+          MSSQL_SA_PASSWORD: ${{ secrets.MSSQL_SA_PASSWORD }}
+        run: |
+          if [ -z "$MSSQL_SA_PASSWORD" ]; then
+            echo "O secret MSSQL_SA_PASSWORD não foi configurado."
+            exit 1
+          fi
+
+          umask 077
+          printf 'MSSQL_SA_PASSWORD=%s\n' "$MSSQL_SA_PASSWORD" > .env
+
+      - name: Validar Docker Compose
+        run: docker compose config --quiet
+
+      - name: Construir e publicar containers
+        run: docker compose up --detach --build --remove-orphans
+
+      - name: Verificar aplicação
+        shell: bash
+        run: |
+          for tentativa in $(seq 1 36); do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/health; then
+              echo
+              echo "Aplicação publicada e saudável."
+              exit 0
+            fi
+
+            echo "Aguardando a aplicação ficar saudável ($tentativa/36)..."
+            sleep 5
+          done
+
+          docker compose logs --tail=150 app sqlserver
+          exit 1
+
+      - name: Exibir estado dos serviços
+        run: docker compose ps
+
+      - name: Remover arquivo temporário de segredo
+        if: always()
+        run: rm -f .env
