@@ -68,6 +68,8 @@ describe('PedidoEditComponent', () => {
           useValue: {
             obterPorId,
             atualizar,
+            obterSumario: () =>
+              of({ totalPedidos: 1, valorTotal: 200, pedidosPagos: 1, pedidosPendentes: 0 }),
             listar: () =>
               of({ itens: [pedido], pagina: 1, tamanhoPagina: 8, totalItens: 1, totalPaginas: 1 }),
           },

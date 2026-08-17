@@ -11,6 +11,7 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 - preço unitário preservado no item no momento da compra;
 - filtros por cliente e situação do pagamento;
 - paginação da listagem;
+- sumário global de pedidos independente de filtros e paginação;
 - respostas de erro padronizadas com `ProblemDetails`;
 - Swagger/OpenAPI;
 - migration e catálogo inicial de produtos;
@@ -181,6 +182,7 @@ Acesse <http://localhost:4200>. O proxy de desenvolvimento encaminha `/api` para
 | `POST`   | `/api/pedidos`      | cria um pedido                        |
 | `GET`    | `/api/pedidos/{id}` | consulta um pedido por id             |
 | `GET`    | `/api/pedidos`      | lista pedidos com filtros e paginação |
+| `GET`    | `/api/pedidos/sumario` | agrega totais, valores e pagamentos de todos os pedidos |
 | `PUT`    | `/api/pedidos/{id}` | atualiza um pedido                    |
 | `DELETE` | `/api/pedidos/{id}` | exclui um pedido                      |
 | `GET`    | `/api/produtos`     | lista o catálogo de produtos          |

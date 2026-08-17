@@ -168,6 +168,29 @@ public sealed class PedidoServiceTests
     }
 
     [Fact]
+    public async Task ObterSumario_DeveRetornarAgregadosGlobaisDoRepositorio()
+    {
+        var esperado = new SumarioPedidosResponse(50, 123_456.78m, 32, 18);
+        _pedidoRepository
+            .ObterSumarioAsync(Arg.Any<CancellationToken>())
+            .Returns(esperado);
+        PedidoService service = CriarService();
+
+        SumarioPedidosResponse resultado = await service.ObterSumarioAsync(
+            CancellationToken.None);
+
+        Assert.Same(esperado, resultado);
+        await _pedidoRepository.Received(1).ObterSumarioAsync(
+            Arg.Any<CancellationToken>());
+        await _pedidoRepository.DidNotReceive().ListarAsync(
+            Arg.Any<int>(),
+            Arg.Any<int>(),
+            Arg.Any<string?>(),
+            Arg.Any<bool?>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task Atualizar_QuandoPedidoExiste_DeveSubstituirDadosEItens()
     {
         Pedido pedido = PedidoBuilder.CriarPedido();

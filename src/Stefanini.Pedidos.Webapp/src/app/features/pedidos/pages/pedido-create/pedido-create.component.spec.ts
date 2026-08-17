@@ -64,6 +64,8 @@ describe('PedidoCreateComponent', () => {
           provide: PedidoService,
           useValue: {
             criar,
+            obterSumario: () =>
+              of({ totalPedidos: 0, valorTotal: 0, pedidosPagos: 0, pedidosPendentes: 0 }),
             listar: () =>
               of({ itens: [], pagina: 1, tamanhoPagina: 8, totalItens: 0, totalPaginas: 0 }),
           },

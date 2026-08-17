@@ -72,6 +72,12 @@ public sealed class PedidoService(
             totalPaginas);
     }
 
+    public Task<SumarioPedidosResponse> ObterSumarioAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return pedidoRepository.ObterSumarioAsync(cancellationToken);
+    }
+
     public async Task<PedidoResponse> AtualizarAsync(
         int id,
         AtualizarPedidoRequest request,

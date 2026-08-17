@@ -27,6 +27,14 @@ describe('PedidoService', () => {
     expect(request.request.method).toBe('GET');
     request.flush({ itens: [], pagina: 2, tamanhoPagina: 8, totalItens: 0, totalPaginas: 0 });
   });
+  it('consulta o sumário global em endpoint independente', () => {
+    service.obterSumario().subscribe();
+
+    const request = http.expectOne('/api/pedidos/sumario');
+
+    expect(request.request.method).toBe('GET');
+    request.flush({ totalPedidos: 50, valorTotal: 1000, pedidosPagos: 30, pedidosPendentes: 20 });
+  });
   it('envia o pedido para criação', () => {
     const payload: CreatePedido = {
       nomeCliente: 'Maria',
