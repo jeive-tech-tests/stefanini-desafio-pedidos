@@ -45,14 +45,12 @@
       >{{ subtotal | currency: 'BRL' : 'symbol' : '1.2-2' }}</strong
     >
   </div>
-  <button
-    pButton
-    type="button"
+  <app-ui-button
     severity="danger"
     [text]="true"
     [rounded]="true"
     icon="pi pi-trash"
-    (click)="remove.emit()"
-    [attr.aria-label]="'Remover item ' + (index + 1)"
-  ></button>
+    (clicked)="remove.emit()"
+    [ariaLabel]="'Remover item ' + (index + 1)"
+  />
 </div>

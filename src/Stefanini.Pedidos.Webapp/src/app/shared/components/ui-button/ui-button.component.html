@@ -1,0 +1,62 @@
+@if (routerLink) {
+  <a
+    pButton
+    [routerLink]="routerLink"
+    [severity]="severity"
+    [outlined]="outlined"
+    [text]="text"
+    [rounded]="rounded"
+    [class]="classes"
+    [attr.aria-label]="ariaLabel || label"
+    [pTooltip]="tooltip || ''"
+  >
+    @if (icon) {
+      <i [class]="icon" aria-hidden="true"></i>
+    }
+    @if (label) {
+      <span>{{ label }}</span>
+    }
+  </a>
+} @else if (href) {
+  <a
+    pButton
+    [href]="href"
+    [target]="target"
+    [severity]="severity"
+    [outlined]="outlined"
+    [text]="text"
+    [rounded]="rounded"
+    [class]="classes"
+    [attr.aria-label]="ariaLabel || label"
+    [pTooltip]="tooltip || ''"
+  >
+    @if (icon) {
+      <i [class]="icon" aria-hidden="true"></i>
+    }
+    @if (label) {
+      <span>{{ label }}</span>
+    }
+  </a>
+} @else {
+  <button
+    pButton
+    [type]="type"
+    [severity]="severity"
+    [outlined]="outlined"
+    [text]="text"
+    [rounded]="rounded"
+    [loading]="loading"
+    [disabled]="disabled"
+    [class]="classes"
+    [attr.aria-label]="ariaLabel || label"
+    [pTooltip]="tooltip || ''"
+    (click)="clicked.emit($event)"
+  >
+    @if (icon && !loading) {
+      <i [class]="icon" aria-hidden="true"></i>
+    }
+    @if (label) {
+      <span>{{ label }}</span>
+    }
+  </button>
+}

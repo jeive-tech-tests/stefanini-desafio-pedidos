@@ -1,12 +1,11 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
+import { UiButtonComponent } from '../../shared/components/ui-button/ui-button.component';
 
 @Component({
   selector: 'app-header',
-  imports: [ButtonModule, RouterLink, RouterLinkActive, TooltipModule],
+  imports: [RouterLink, RouterLinkActive, UiButtonComponent],
   templateUrl: './header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

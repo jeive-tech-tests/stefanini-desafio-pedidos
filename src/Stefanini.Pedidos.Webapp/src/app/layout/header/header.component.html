@@ -35,29 +35,25 @@
       >
     </nav>
     <div class="ml-auto flex items-center gap-1 sm:gap-2">
-      <button
-        pButton
-        type="button"
+      <app-ui-button
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        [attr.aria-label]="darkTheme() ? 'Ativar tema claro' : 'Ativar tema escuro'"
-        [pTooltip]="darkTheme() ? 'Tema claro' : 'Tema escuro'"
-        (click)="toggleTheme()"
-      >
-        <i [class]="darkTheme() ? 'pi pi-sun' : 'pi pi-moon'"></i>
-      </button>
-      <a
-        pButton
+        [icon]="darkTheme() ? 'pi pi-sun' : 'pi pi-moon'"
+        [ariaLabel]="darkTheme() ? 'Ativar tema claro' : 'Ativar tema escuro'"
+        [tooltip]="darkTheme() ? 'Tema claro' : 'Tema escuro'"
+        (clicked)="toggleTheme()"
+      />
+      <app-ui-button
         severity="secondary"
         [text]="true"
         [rounded]="true"
         icon="pi pi-external-link"
         href="swagger"
         target="_blank"
-        aria-label="Abrir Swagger"
-        pTooltip="Abrir Swagger"
-      ></a>
+        ariaLabel="Abrir Swagger"
+        tooltip="Abrir Swagger"
+      />
     </div>
   </div>
 </header>

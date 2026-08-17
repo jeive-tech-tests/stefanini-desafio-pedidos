@@ -14,13 +14,14 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { CreatePedido } from '../../models/create-pedido.model';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
+import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
+import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
 import {
   PedidoItemFormComponent,
   PedidoItemFormGroup,
@@ -30,13 +31,14 @@ import {
 @Component({
   selector: 'app-pedido-form',
   imports: [
-    ButtonModule,
     CurrencyPipe,
     InputTextModule,
     MessageModule,
     PedidoItemFormComponent,
     ReactiveFormsModule,
     ToggleSwitchModule,
+    UiButtonComponent,
+    UiCardComponent,
   ],
   templateUrl: './pedido-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,13 @@
+<p-dialog
+  [visible]="visible"
+  [header]="header"
+  [modal]="true"
+  [closable]="closable"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width, maxHeight: '94vh' }"
+  [contentStyle]="{ overflow: 'auto' }"
+  (visibleChange)="changeVisibility($event)"
+>
+  <ng-content />
+</p-dialog>

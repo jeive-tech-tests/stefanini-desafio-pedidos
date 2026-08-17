@@ -12,20 +12,20 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
-import { PaginatorModule, PaginatorState } from 'primeng/paginator';
+import { PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 import { debounceTime, finalize } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { mensagemErroHttp } from '../../../../shared/utils/http-error';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { LoadingComponent } from '../../../../shared/components/loading/loading.component';
+import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
+import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
+import { UiTableComponent } from '../../../../shared/components/ui-table/ui-table.component';
 import { Pedido } from '../../models/pedido.model';
 import { PedidosQuery } from '../../models/pedidos-query.model';
 import { PedidoService } from '../../services/pedido.service';
@@ -35,20 +35,19 @@ type StatusFiltro = 'todos' | 'pago' | 'pendente';
 @Component({
   selector: 'app-pedido-list',
   imports: [
-    ButtonModule,
     ConfirmDialogModule,
     CurrencyPipe,
     InputTextModule,
     MessageModule,
-    PaginatorModule,
     ReactiveFormsModule,
     RouterLink,
     SelectModule,
-    TableModule,
     TagModule,
-    TooltipModule,
     EmptyStateComponent,
     LoadingComponent,
+    UiButtonComponent,
+    UiCardComponent,
+    UiTableComponent,
   ],
   templateUrl: './pedido-list.component.html',
   providers: [ConfirmationService],

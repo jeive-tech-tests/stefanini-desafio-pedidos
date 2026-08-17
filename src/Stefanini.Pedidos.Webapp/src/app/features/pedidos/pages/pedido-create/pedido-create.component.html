@@ -1,13 +1,8 @@
-<section class="mx-auto w-full max-w-[1320px] px-4 py-7 sm:px-6 sm:py-9 lg:px-10">
-  <a
-    class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500"
-    routerLink="/pedidos"
-    ><i class="pi pi-arrow-left"></i>Voltar para pedidos</a
-  ><app-page-header
-    eyebrow="Novo registro"
-    title="Criar pedido"
-    description="Informe os dados do cliente e selecione os produtos."
-  />
+<app-pedido-list />
+<app-ui-modal [visible]="true" header="Novo pedido" (closed)="cancelar()">
+  <p class="mb-6 text-sm text-slate-500 dark:text-blue-200/70">
+    Informe os dados do cliente e selecione os produtos do pedido.
+  </p>
   @if (carregando()) {
     <app-loading label="Carregando formulário..." />
   } @else {
@@ -18,4 +13,4 @@
       (cancelled)="cancelar()"
     />
   }
-</section>
+</app-ui-modal>
