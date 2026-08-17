@@ -2,8 +2,10 @@ import { Signal } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
 import { of } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { UiConfirmationService } from '../../../../shared/components/ui-confirm-dialog/ui-confirm-dialog.component';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
 import { UpdatePedido } from '../../models/update-pedido.model';
@@ -56,13 +58,23 @@ describe('PedidoEditComponent', () => {
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
+        ConfirmationService,
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: convertToParamMap({ id: '42' }) } },
         },
-        { provide: PedidoService, useValue: { obterPorId, atualizar } },
+        {
+          provide: PedidoService,
+          useValue: {
+            obterPorId,
+            atualizar,
+            listar: () =>
+              of({ itens: [pedido], pagina: 1, tamanhoPagina: 8, totalItens: 1, totalPaginas: 1 }),
+          },
+        },
         { provide: ProdutoService, useValue: { listar: () => of([produto]) } },
         { provide: NotificationService, useValue: { success: notificar } },
+        { provide: UiConfirmationService, useValue: { confirm: vi.fn() } },
       ],
     }).compileComponents();
   });
@@ -76,9 +88,10 @@ describe('PedidoEditComponent', () => {
     expect(component.pedido()).toBe(pedido);
     expect(component.produtos()).toEqual([produto]);
     expect(component.carregando()).toBe(false);
+    expect(fixture.nativeElement.textContent).toContain('Editar pedido #42');
   });
 
-  it('atualiza, notifica e navega para os detalhes', () => {
+  it('atualiza, notifica e retorna para a listagem', () => {
     const fixture = TestBed.createComponent(PedidoEditComponent);
     const router = TestBed.inject(Router);
     const navegar = vi.spyOn(router, 'navigate').mockResolvedValue(true);
@@ -97,10 +110,10 @@ describe('PedidoEditComponent', () => {
       'Pedido atualizado',
       'Pedido #42 atualizado com sucesso.',
     );
-    expect(navegar).toHaveBeenCalledWith(['/pedidos', 42]);
+    expect(navegar).toHaveBeenCalledWith(['/pedidos']);
   });
 
-  it('cancela retornando aos detalhes', () => {
+  it('fecha o modal retornando para a listagem', () => {
     const fixture = TestBed.createComponent(PedidoEditComponent);
     const router = TestBed.inject(Router);
     const navegar = vi.spyOn(router, 'navigate').mockResolvedValue(true);
@@ -108,6 +121,6 @@ describe('PedidoEditComponent', () => {
 
     (fixture.componentInstance as unknown as PedidoEditHarness).cancelar();
 
-    expect(navegar).toHaveBeenCalledWith(['/pedidos', 42]);
+    expect(navegar).toHaveBeenCalledWith(['/pedidos']);
   });
 });
