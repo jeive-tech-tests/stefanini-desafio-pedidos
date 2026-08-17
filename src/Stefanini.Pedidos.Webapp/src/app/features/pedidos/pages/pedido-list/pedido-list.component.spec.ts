@@ -163,6 +163,23 @@ describe('PedidoListComponent', () => {
     expect(obterSumario).toHaveBeenCalledTimes(1);
   });
 
+  it('filtra pedidos pelo produto selecionado sem atualizar o sumário', async () => {
+    vi.useFakeTimers();
+    const fixture = TestBed.createComponent(PedidoListComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance as unknown as PedidoListHarness;
+
+    component.filtros.get('idProduto')!.setValue(1);
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(listarPedidos).toHaveBeenLastCalledWith({
+      pagina: 1,
+      tamanhoPagina: 8,
+      idProduto: 1,
+    });
+    expect(obterSumario).toHaveBeenCalledTimes(1);
+  });
+
   it('cancela uma listagem anterior ao iniciar uma nova consulta', () => {
     let consultaAnteriorCancelada = false;
     listarPedidos

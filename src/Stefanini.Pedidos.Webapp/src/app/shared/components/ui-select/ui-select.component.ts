@@ -38,6 +38,7 @@ export class UiSelectComponent implements ControlValueAccessor {
   @Input() filterPlaceholder = 'Buscar...';
   @Input() emptyFilterMessage = 'Nenhum resultado encontrado.';
   @Input() resetFilterOnHide = true;
+  @Input() showClear = false;
 
   protected value: unknown = null;
   protected disabled = false;

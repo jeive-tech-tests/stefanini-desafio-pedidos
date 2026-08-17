@@ -20,6 +20,7 @@ export class PedidoService {
       .set('tamanhoPagina', query.tamanhoPagina);
 
     if (query.nomeCliente) params = params.set('nomeCliente', query.nomeCliente);
+    if (query.idProduto !== undefined) params = params.set('idProduto', query.idProduto);
     if (query.pago !== undefined) params = params.set('pago', query.pago);
 
     return this.http.get<ResultadoPaginado<Pedido>>(this.url, { params });

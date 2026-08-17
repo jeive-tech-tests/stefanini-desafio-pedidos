@@ -193,12 +193,13 @@ Parâmetros opcionais da listagem:
 - `pagina` — número da página, começando em 1;
 - `tamanhoPagina` — quantidade de registros, entre 1 e 100;
 - `nomeCliente` — trecho do nome do cliente;
+- `idProduto` — identificador do produto presente nos itens do pedido;
 - `pago` — `true` ou `false`.
 
 Exemplo:
 
 ```http
-GET /api/pedidos?pagina=1&tamanhoPagina=10&nomeCliente=maria&pago=false
+GET /api/pedidos?pagina=1&tamanhoPagina=10&nomeCliente=maria&idProduto=1&pago=false
 ```
 
 ### Criar pedido

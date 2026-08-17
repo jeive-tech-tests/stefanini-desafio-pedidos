@@ -28,6 +28,7 @@ public sealed class PedidoRepository(PedidosDbContext context) : IPedidoReposito
         int pagina,
         int tamanhoPagina,
         string? nomeCliente,
+        int? idProduto,
         bool? pago,
         CancellationToken cancellationToken = default)
     {
@@ -36,6 +37,12 @@ public sealed class PedidoRepository(PedidosDbContext context) : IPedidoReposito
         if (!string.IsNullOrWhiteSpace(nomeCliente))
         {
             query = query.Where(pedido => pedido.NomeCliente.Contains(nomeCliente));
+        }
+
+        if (idProduto.HasValue)
+        {
+            query = query.Where(pedido => pedido.ItensPedido.Any(
+                item => item.ProdutoId == idProduto.Value));
         }
 
         if (pago.HasValue)

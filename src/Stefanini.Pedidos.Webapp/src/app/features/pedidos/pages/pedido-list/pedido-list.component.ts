@@ -109,6 +109,7 @@ export class PedidoListComponent implements OnInit {
 
   protected readonly filtros = new FormGroup({
     nomeCliente: new FormControl('', { nonNullable: true }),
+    idProduto: new FormControl<number | null>(null),
     status: new FormControl<StatusFiltro>('todos', { nonNullable: true }),
   });
 
@@ -150,12 +151,15 @@ export class PedidoListComponent implements OnInit {
       .pipe(
         map((filtros) => ({
           nomeCliente: filtros.nomeCliente?.trim() ?? '',
+          idProduto: filtros.idProduto ?? null,
           status: filtros.status ?? 'todos',
         })),
         debounceTime(TEMPO_ESPERA_FILTRO_MS),
         distinctUntilChanged(
           (anterior, atual) =>
-            anterior.nomeCliente === atual.nomeCliente && anterior.status === atual.status,
+            anterior.nomeCliente === atual.nomeCliente &&
+            anterior.idProduto === atual.idProduto &&
+            anterior.status === atual.status,
         ),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -183,16 +187,18 @@ export class PedidoListComponent implements OnInit {
   private criarFiltro(): PedidosQuery {
     const status = this.filtros.controls.status.value;
     const nomeCliente = this.filtros.controls.nomeCliente.value.trim();
+    const idProduto = this.filtros.controls.idProduto.value;
     return {
       pagina: this.pagina(),
       tamanhoPagina: this.tamanhoPagina(),
       ...(nomeCliente ? { nomeCliente } : {}),
+      ...(idProduto !== null ? { idProduto } : {}),
       ...(status !== 'todos' ? { pago: status === 'pago' } : {}),
     };
   }
 
   protected limparFiltros(): void {
-    this.filtros.setValue({ nomeCliente: '', status: 'todos' });
+    this.filtros.setValue({ nomeCliente: '', idProduto: null, status: 'todos' });
   }
 
   protected alterarPagina(evento: UiPageChange): void {

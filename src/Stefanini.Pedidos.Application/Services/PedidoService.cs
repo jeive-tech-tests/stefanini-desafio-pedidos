@@ -53,6 +53,7 @@ public sealed class PedidoService(
             query.Pagina,
             query.TamanhoPagina,
             query.NomeCliente?.Trim(),
+            query.IdProduto,
             query.Pago,
             cancellationToken);
 

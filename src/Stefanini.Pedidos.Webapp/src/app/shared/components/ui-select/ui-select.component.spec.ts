@@ -15,6 +15,7 @@ import { UiSelectComponent } from './ui-select.component';
       filterBy="nome"
       filterPlaceholder="Buscar produto..."
       emptyFilterMessage="Nenhum produto encontrado."
+      [showClear]="true"
     />
   `,
 })
@@ -37,5 +38,6 @@ describe('UiSelectComponent', () => {
     expect(select.filterPlaceholder).toBe('Buscar produto...');
     expect(select.emptyFilterMessage).toBe('Nenhum produto encontrado.');
     expect(select.resetFilterOnHide).toBe(true);
+    expect(select.showClear).toBe(true);
   });
 });
