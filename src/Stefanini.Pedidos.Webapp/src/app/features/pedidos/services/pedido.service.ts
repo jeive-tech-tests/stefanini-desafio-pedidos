@@ -6,6 +6,7 @@ import { CreatePedido } from '../models/create-pedido.model';
 import { Pedido } from '../models/pedido.model';
 import { PedidosQuery } from '../models/pedidos-query.model';
 import { ResultadoPaginado } from '../models/resultado-paginado.model';
+import { SumarioPedidos } from '../models/sumario-pedidos.model';
 import { UpdatePedido } from '../models/update-pedido.model';
 
 @Injectable({ providedIn: 'root' })
@@ -22,6 +23,10 @@ export class PedidoService {
     if (query.pago !== undefined) params = params.set('pago', query.pago);
 
     return this.http.get<ResultadoPaginado<Pedido>>(this.url, { params });
+  }
+
+  obterSumario(): Observable<SumarioPedidos> {
+    return this.http.get<SumarioPedidos>(`${this.url}/sumario`);
   }
 
   obterPorId(id: number): Observable<Pedido> {

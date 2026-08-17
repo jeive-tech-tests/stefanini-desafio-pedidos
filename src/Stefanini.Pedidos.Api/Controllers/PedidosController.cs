@@ -47,6 +47,17 @@ public sealed class PedidosController(IPedidoService pedidoService) : Controller
         return Ok(resultado);
     }
 
+    [HttpGet("sumario")]
+    [ProducesResponseType<SumarioPedidosResponse>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<SumarioPedidosResponse>> ObterSumario(
+        CancellationToken cancellationToken)
+    {
+        SumarioPedidosResponse sumario = await pedidoService.ObterSumarioAsync(
+            cancellationToken);
+
+        return Ok(sumario);
+    }
+
     [HttpPut("{id:int}")]
     [ProducesResponseType<PedidoResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]

@@ -19,26 +19,27 @@
     />
   </header>
 
-  @if (erro()) {
+  @if (mensagemErro()) {
     <div
       class="mb-5 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
       role="alert"
     >
       <span class="flex items-center gap-2"
-        ><i class="pi pi-exclamation-circle"></i>{{ erro() }}</span
+        ><i class="pi pi-exclamation-circle"></i>{{ mensagemErro() }}</span
       >
       <app-ui-button
         label="Tentar novamente"
         severity="danger"
         [text]="true"
-        (clicked)="carregar()"
+        (clicked)="carregarTudo()"
       />
     </div>
   }
 
   <section
     class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
-    aria-label="Resumo da página atual"
+    aria-label="Sumário geral dos pedidos"
+    [attr.aria-busy]="carregandoSumario()"
   >
     <app-ui-card cardClass="flex min-h-32 items-center gap-4">
       <span
@@ -51,10 +52,10 @@
           >Total de pedidos</span
         >
         <strong class="mt-1 block text-2xl font-bold text-slate-950 dark:text-white">{{
-          totalItens()
+          sumario().totalPedidos
         }}</strong>
         <small class="mt-1 block text-xs text-blue-600 dark:text-blue-400"
-          >{{ pedidos().length }} nesta página</small
+          >Base completa de pedidos</small
         >
       </div>
     </app-ui-card>
@@ -66,14 +67,12 @@
         <i class="pi pi-dollar" aria-hidden="true"></i>
       </span>
       <div>
-        <span class="text-sm font-semibold text-slate-500 dark:text-slate-400"
-          >Valor da página</span
-        >
+        <span class="text-sm font-semibold text-slate-500 dark:text-slate-400">Valor total</span>
         <strong class="mt-1 block text-2xl font-bold text-slate-950 dark:text-white">
-          {{ valorTotalPagina() | currency: 'BRL' : 'symbol' : '1.2-2' }}
+          {{ sumario().valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
         </strong>
         <small class="mt-1 block text-xs text-slate-500 dark:text-slate-400"
-          >Soma dos pedidos exibidos</small
+          >Soma de todos os pedidos</small
         >
       </div>
     </app-ui-card>
@@ -87,10 +86,10 @@
       <div>
         <span class="text-sm font-semibold text-slate-500 dark:text-slate-400">Pedidos pagos</span>
         <strong class="mt-1 block text-2xl font-bold text-slate-950 dark:text-white">{{
-          pagosPagina()
+          sumario().pedidosPagos
         }}</strong>
         <small class="mt-1 block text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-          {{ percentual(pagosPagina()) }}% da página
+          {{ percentual(sumario().pedidosPagos) }}% do total
         </small>
       </div>
     </app-ui-card>
@@ -106,10 +105,10 @@
           >Pedidos pendentes</span
         >
         <strong class="mt-1 block text-2xl font-bold text-slate-950 dark:text-white">{{
-          pendentesPagina()
+          sumario().pedidosPendentes
         }}</strong>
         <small class="mt-1 block text-xs font-semibold text-orange-600 dark:text-orange-400">
-          {{ percentual(pendentesPagina()) }}% da página
+          {{ percentual(sumario().pedidosPendentes) }}% do total
         </small>
       </div>
     </app-ui-card>

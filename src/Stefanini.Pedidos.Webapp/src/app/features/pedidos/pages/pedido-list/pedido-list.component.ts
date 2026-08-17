@@ -46,6 +46,7 @@ import { PedidosQuery } from '../../models/pedidos-query.model';
 import { PedidoService } from '../../services/pedido.service';
 import { ProdutoService } from '../../services/produto.service';
 import { Produto } from '../../models/produto.model';
+import { SumarioPedidos } from '../../models/sumario-pedidos.model';
 
 type StatusFiltro = 'todos' | 'pago' | 'pendente';
 const TEMPO_ESPERA_FILTRO_MS = 500;
@@ -87,15 +88,15 @@ export class PedidoListComponent implements OnInit {
   protected readonly tamanhoPagina = signal(8);
   protected readonly totalItens = signal(0);
   protected readonly totalPaginas = signal(0);
-  protected readonly valorTotalPagina = computed(() =>
-    this.pedidos().reduce((total, pedido) => total + pedido.valorTotal, 0),
-  );
-  protected readonly pagosPagina = computed(
-    () => this.pedidos().filter((pedido) => pedido.pago).length,
-  );
-  protected readonly pendentesPagina = computed(
-    () => this.pedidos().filter((pedido) => !pedido.pago).length,
-  );
+  protected readonly sumario = signal<SumarioPedidos>({
+    totalPedidos: 0,
+    valorTotal: 0,
+    pedidosPagos: 0,
+    pedidosPendentes: 0,
+  });
+  protected readonly carregandoSumario = signal(true);
+  protected readonly erroSumario = signal<string | null>(null);
+  protected readonly mensagemErro = computed(() => this.erro() ?? this.erroSumario());
 
   protected readonly statusOpcoes = [
     { label: 'Todos os status', value: 'todos' as const },
@@ -160,11 +161,16 @@ export class PedidoListComponent implements OnInit {
         this.carregar();
       });
 
-    this.carregar();
+    this.carregarTudo();
   }
 
   protected carregar(): void {
     this.recarregarPedidos$.next();
+  }
+
+  protected carregarTudo(): void {
+    this.carregarSumario();
+    this.carregar();
   }
 
   private criarFiltro(): PedidosQuery {
@@ -213,7 +219,8 @@ export class PedidoListComponent implements OnInit {
   }
 
   protected percentual(quantidade: number): number {
-    return this.pedidos().length === 0 ? 0 : Math.round((quantidade / this.pedidos().length) * 100);
+    const totalPedidos = this.sumario().totalPedidos;
+    return totalPedidos === 0 ? 0 : Math.round((quantidade / totalPedidos) * 100);
   }
 
   protected imagemProduto(idProduto: number): string {
@@ -239,9 +246,25 @@ export class PedidoListComponent implements OnInit {
           if (this.pedidos().length === 1 && this.pagina() > 1) {
             this.pagina.update((pagina) => pagina - 1);
           }
-          this.carregar();
+          this.carregarTudo();
         },
         error: (error: unknown) => this.erro.set(mensagemErroHttp(error)),
+      });
+  }
+
+  private carregarSumario(): void {
+    this.carregandoSumario.set(true);
+    this.erroSumario.set(null);
+
+    this.pedidosService
+      .obterSumario()
+      .pipe(
+        finalize(() => this.carregandoSumario.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (sumario) => this.sumario.set(sumario),
+        error: (error: unknown) => this.erroSumario.set(mensagemErroHttp(error)),
       });
   }
 }

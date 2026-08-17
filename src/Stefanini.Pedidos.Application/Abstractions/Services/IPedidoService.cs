@@ -15,6 +15,9 @@ public interface IPedidoService
         PedidosQuery query,
         CancellationToken cancellationToken = default);
 
+    Task<SumarioPedidosResponse> ObterSumarioAsync(
+        CancellationToken cancellationToken = default);
+
     Task<PedidoResponse> AtualizarAsync(
         int id,
         AtualizarPedidoRequest request,

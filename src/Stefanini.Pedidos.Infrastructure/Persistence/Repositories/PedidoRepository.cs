@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Stefanini.Pedidos.Application.Abstractions.Persistence;
+using Stefanini.Pedidos.Application.Models.Pedidos;
 using Stefanini.Pedidos.Domain.Entities;
 
 namespace Stefanini.Pedidos.Infrastructure.Persistence.Repositories;
@@ -51,6 +52,28 @@ public sealed class PedidoRepository(PedidosDbContext context) : IPedidoReposito
             .ToListAsync(cancellationToken);
 
         return (pedidos, total);
+    }
+
+    public async Task<SumarioPedidosResponse> ObterSumarioAsync(
+        CancellationToken cancellationToken = default)
+    {
+        SumarioPedidosResponse? sumario = await context.Pedidos
+            .AsNoTracking()
+            .Select(pedido => new
+            {
+                pedido.Pago,
+                ValorTotal = pedido.ItensPedido.Sum(
+                    item => item.ValorUnitario * item.Quantidade)
+            })
+            .GroupBy(_ => 1)
+            .Select(grupo => new SumarioPedidosResponse(
+                grupo.Count(),
+                grupo.Sum(pedido => pedido.ValorTotal),
+                grupo.Count(pedido => pedido.Pago),
+                grupo.Count(pedido => !pedido.Pago)))
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return sumario ?? new SumarioPedidosResponse(0, 0m, 0, 0);
     }
 
     public async Task AdicionarAsync(

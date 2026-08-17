@@ -1,3 +1,4 @@
+using Stefanini.Pedidos.Application.Models.Pedidos;
 using Stefanini.Pedidos.Domain.Entities;
 
 namespace Stefanini.Pedidos.Application.Abstractions.Persistence;
@@ -14,6 +15,9 @@ public interface IPedidoRepository
         int tamanhoPagina,
         string? nomeCliente,
         bool? pago,
+        CancellationToken cancellationToken = default);
+
+    Task<SumarioPedidosResponse> ObterSumarioAsync(
         CancellationToken cancellationToken = default);
 
     Task AdicionarAsync(Pedido pedido, CancellationToken cancellationToken = default);

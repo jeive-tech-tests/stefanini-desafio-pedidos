@@ -130,6 +130,26 @@ public sealed class PedidosApiTests : IClassFixture<PedidosApiFactory>
     }
 
     [Fact]
+    public async Task Sumario_DeveAgregarTodosOsPedidosSemDependerDaPaginacao()
+    {
+        SumarioPedidosResponse? antes = await _client.GetFromJsonAsync<SumarioPedidosResponse>(
+            "/api/pedidos/sumario");
+        Assert.NotNull(antes);
+
+        await CriarPedidoAsync("Cliente pago no sumário", pago: true);
+        await CriarPedidoAsync("Cliente pendente no sumário");
+
+        SumarioPedidosResponse? depois = await _client.GetFromJsonAsync<SumarioPedidosResponse>(
+            "/api/pedidos/sumario");
+
+        Assert.NotNull(depois);
+        Assert.Equal(antes.TotalPedidos + 2, depois.TotalPedidos);
+        Assert.Equal(antes.ValorTotal + 17_459.40m, depois.ValorTotal);
+        Assert.Equal(antes.PedidosPagos + 1, depois.PedidosPagos);
+        Assert.Equal(antes.PedidosPendentes + 1, depois.PedidosPendentes);
+    }
+
+    [Fact]
     public async Task Produtos_DeveListarCatalogoEEntregarImagem()
     {
         ProdutoResponse[]? produtos = await _client.GetFromJsonAsync<ProdutoResponse[]>(
@@ -146,13 +166,13 @@ public sealed class PedidosApiTests : IClassFixture<PedidosApiFactory>
         Assert.Equal([1, 2, 3], await imagem.Content.ReadAsByteArrayAsync());
     }
 
-    private async Task<PedidoResponse> CriarPedidoAsync(string nomeCliente)
+    private async Task<PedidoResponse> CriarPedidoAsync(string nomeCliente, bool pago = false)
     {
         var request = new CriarPedidoRequest
         {
             NomeCliente = nomeCliente,
             EmailCliente = $"{Guid.NewGuid():N}@example.com",
-            Pago = false,
+            Pago = pago,
             ItensPedido =
             [
                 new ItemPedidoRequest { IdProduto = 1, Quantidade = 2 },
