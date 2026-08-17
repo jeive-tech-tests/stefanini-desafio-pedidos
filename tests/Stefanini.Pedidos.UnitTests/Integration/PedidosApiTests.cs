@@ -130,6 +130,24 @@ public sealed class PedidosApiTests : IClassFixture<PedidosApiFactory>
     }
 
     [Fact]
+    public async Task Listar_QuandoFiltradoPorEmail_DeveRetornarClienteCorrespondente()
+    {
+        string identificador = Guid.NewGuid().ToString("N");
+        string email = $"filtro.{identificador}@example.com";
+        PedidoResponse criado = await CriarPedidoAsync("Cliente por e-mail", emailCliente: email);
+
+        ResultadoPaginado<PedidoResponse>? resultado = await _client.GetFromJsonAsync<
+            ResultadoPaginado<PedidoResponse>>(
+            $"/api/pedidos?pagina=1&tamanhoPagina=5&nomeCliente={Uri.EscapeDataString(identificador)}");
+
+        Assert.NotNull(resultado);
+        PedidoResponse pedido = Assert.Single(resultado.Itens);
+        Assert.Equal(criado.Id, pedido.Id);
+        Assert.Equal(email, pedido.EmailCliente);
+        Assert.Equal(1, resultado.TotalItens);
+    }
+
+    [Fact]
     public async Task Listar_QuandoFiltradoPorProduto_DeveRetornarSomentePedidosCorrespondentes()
     {
         string nome = $"Produto {Guid.NewGuid():N}"[..20];
@@ -191,12 +209,13 @@ public sealed class PedidosApiTests : IClassFixture<PedidosApiFactory>
     private async Task<PedidoResponse> CriarPedidoAsync(
         string nomeCliente,
         bool pago = false,
-        IReadOnlyCollection<ItemPedidoRequest>? itensPedido = null)
+        IReadOnlyCollection<ItemPedidoRequest>? itensPedido = null,
+        string? emailCliente = null)
     {
         var request = new CriarPedidoRequest
         {
             NomeCliente = nomeCliente,
-            EmailCliente = $"{Guid.NewGuid():N}@example.com",
+            EmailCliente = emailCliente ?? $"{Guid.NewGuid():N}@example.com",
             Pago = pago,
             ItensPedido = itensPedido ??
             [

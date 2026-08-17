@@ -9,7 +9,7 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 - criação, consulta, edição e exclusão de pedidos;
 - cálculo do valor total no backend e no frontend;
 - preço unitário preservado no item no momento da compra;
-- filtros por cliente e situação do pagamento;
+- filtros por nome ou e-mail do cliente, produto e situação do pagamento;
 - paginação da listagem;
 - sumário global de pedidos independente de filtros e paginação;
 - respostas de erro padronizadas com `ProblemDetails`;
@@ -21,16 +21,16 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 
 ## Tecnologias
 
-| Camada              | Tecnologia                                                |
-| ------------------- | --------------------------------------------------------- |
-| API                 | .NET 10, ASP.NET Core, Entity Framework Core              |
-| Arquitetura         | Clean Architecture, DDD tático, Repository e Unit of Work |
-| Banco de dados      | SQL Server 2022                                           |
-| Documentação da API | Swagger/OpenAPI                                           |
+| Camada              | Tecnologia                                                   |
+| ------------------- | ------------------------------------------------------------ |
+| API                 | .NET 10, ASP.NET Core, Entity Framework Core                 |
+| Arquitetura         | Clean Architecture, DDD tático, Repository e Unit of Work    |
+| Banco de dados      | SQL Server 2022                                              |
+| Documentação da API | Swagger/OpenAPI                                              |
 | Frontend            | Angular 21, PrimeNG 21, Tailwind CSS 4, TypeScript 5.9, RxJS |
-| Testes              | xUnit, NSubstitute e Vitest                               |
-| Objetos             | MinIO para imagens dos produtos                           |
-| Infraestrutura      | Docker e Docker Compose                                   |
+| Testes              | xUnit, NSubstitute e Vitest                                  |
+| Objetos             | MinIO para imagens dos produtos                              |
+| Infraestrutura      | Docker e Docker Compose                                      |
 
 ## Arquitetura
 
@@ -177,22 +177,22 @@ Acesse <http://localhost:4200>. O proxy de desenvolvimento encaminha `/api` para
 
 ## Endpoints
 
-| Método   | Rota                | Descrição                             |
-| -------- | ------------------- | ------------------------------------- |
-| `POST`   | `/api/pedidos`      | cria um pedido                        |
-| `GET`    | `/api/pedidos/{id}` | consulta um pedido por id             |
-| `GET`    | `/api/pedidos`      | lista pedidos com filtros e paginação |
-| `GET`    | `/api/pedidos/sumario` | agrega totais, valores e pagamentos de todos os pedidos |
-| `PUT`    | `/api/pedidos/{id}` | atualiza um pedido                    |
-| `DELETE` | `/api/pedidos/{id}` | exclui um pedido                      |
-| `GET`    | `/api/produtos`     | lista o catálogo de produtos          |
-| `GET`    | `/api/produtos/{id}/imagem` | entrega a imagem do produto armazenada no MinIO |
+| Método   | Rota                        | Descrição                                               |
+| -------- | --------------------------- | ------------------------------------------------------- |
+| `POST`   | `/api/pedidos`              | cria um pedido                                          |
+| `GET`    | `/api/pedidos/{id}`         | consulta um pedido por id                               |
+| `GET`    | `/api/pedidos`              | lista pedidos com filtros e paginação                   |
+| `GET`    | `/api/pedidos/sumario`      | agrega totais, valores e pagamentos de todos os pedidos |
+| `PUT`    | `/api/pedidos/{id}`         | atualiza um pedido                                      |
+| `DELETE` | `/api/pedidos/{id}`         | exclui um pedido                                        |
+| `GET`    | `/api/produtos`             | lista o catálogo de produtos                            |
+| `GET`    | `/api/produtos/{id}/imagem` | entrega a imagem do produto armazenada no MinIO         |
 
 Parâmetros opcionais da listagem:
 
 - `pagina` — número da página, começando em 1;
 - `tamanhoPagina` — quantidade de registros, entre 1 e 100;
-- `nomeCliente` — trecho do nome do cliente;
+- `nomeCliente` — trecho do nome ou do e-mail do cliente;
 - `idProduto` — identificador do produto presente nos itens do pedido;
 - `pago` — `true` ou `false`.
 
