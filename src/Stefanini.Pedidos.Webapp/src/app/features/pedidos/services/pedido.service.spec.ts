@@ -17,11 +17,14 @@ describe('PedidoService', () => {
   });
   afterEach(() => http.verify());
   it('envia paginação e filtros na listagem', () => {
-    service.listar({ pagina: 2, tamanhoPagina: 8, nomeCliente: 'Maria', pago: false }).subscribe();
+    service
+      .listar({ pagina: 2, tamanhoPagina: 8, nomeCliente: 'Maria', idProduto: 5, pago: false })
+      .subscribe();
     const request = http.expectOne(
       (req) =>
         req.url === '/api/pedidos' &&
         req.params.get('pagina') === '2' &&
+        req.params.get('idProduto') === '5' &&
         req.params.get('pago') === 'false',
     );
     expect(request.request.method).toBe('GET');
@@ -55,6 +58,7 @@ describe('PedidoService', () => {
     const request = http.expectOne('/api/pedidos?pagina=1&tamanhoPagina=10');
 
     expect(request.request.params.has('nomeCliente')).toBe(false);
+    expect(request.request.params.has('idProduto')).toBe(false);
     expect(request.request.params.has('pago')).toBe(false);
     request.flush({ itens: [], pagina: 1, tamanhoPagina: 10, totalItens: 0, totalPaginas: 0 });
   });

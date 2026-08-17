@@ -14,6 +14,7 @@ public interface IPedidoRepository
         int pagina,
         int tamanhoPagina,
         string? nomeCliente,
+        int? idProduto,
         bool? pago,
         CancellationToken cancellationToken = default);
 

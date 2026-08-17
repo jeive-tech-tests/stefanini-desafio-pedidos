@@ -130,6 +130,28 @@ public sealed class PedidosApiTests : IClassFixture<PedidosApiFactory>
     }
 
     [Fact]
+    public async Task Listar_QuandoFiltradoPorProduto_DeveRetornarSomentePedidosCorrespondentes()
+    {
+        string nome = $"Produto {Guid.NewGuid():N}"[..20];
+        await CriarPedidoAsync(
+            nome,
+            itensPedido: [new ItemPedidoRequest { IdProduto = 5, Quantidade = 1 }]);
+        await CriarPedidoAsync(
+            nome,
+            itensPedido: [new ItemPedidoRequest { IdProduto = 1, Quantidade = 1 }]);
+
+        ResultadoPaginado<PedidoResponse>? resultado = await _client.GetFromJsonAsync<
+            ResultadoPaginado<PedidoResponse>>(
+            $"/api/pedidos?pagina=1&tamanhoPagina=10&nomeCliente={Uri.EscapeDataString(nome)}&idProduto=5");
+
+        Assert.NotNull(resultado);
+        PedidoResponse pedido = Assert.Single(resultado.Itens);
+        Assert.Equal(nome, pedido.NomeCliente);
+        Assert.Equal(5, Assert.Single(pedido.ItensPedido).IdProduto);
+        Assert.Equal(1, resultado.TotalItens);
+    }
+
+    [Fact]
     public async Task Sumario_DeveAgregarTodosOsPedidosSemDependerDaPaginacao()
     {
         SumarioPedidosResponse? antes = await _client.GetFromJsonAsync<SumarioPedidosResponse>(
@@ -166,14 +188,17 @@ public sealed class PedidosApiTests : IClassFixture<PedidosApiFactory>
         Assert.Equal([1, 2, 3], await imagem.Content.ReadAsByteArrayAsync());
     }
 
-    private async Task<PedidoResponse> CriarPedidoAsync(string nomeCliente, bool pago = false)
+    private async Task<PedidoResponse> CriarPedidoAsync(
+        string nomeCliente,
+        bool pago = false,
+        IReadOnlyCollection<ItemPedidoRequest>? itensPedido = null)
     {
         var request = new CriarPedidoRequest
         {
             NomeCliente = nomeCliente,
             EmailCliente = $"{Guid.NewGuid():N}@example.com",
             Pago = pago,
-            ItensPedido =
+            ItensPedido = itensPedido ??
             [
                 new ItemPedidoRequest { IdProduto = 1, Quantidade = 2 },
                 new ItemPedidoRequest { IdProduto = 4, Quantidade = 1 }
