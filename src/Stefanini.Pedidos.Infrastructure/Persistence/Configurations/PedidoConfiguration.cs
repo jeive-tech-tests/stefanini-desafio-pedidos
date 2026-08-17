@@ -14,15 +14,19 @@ internal sealed class PedidoConfiguration : IEntityTypeConfiguration<Pedido>
         builder.Property(pedido => pedido.Id).ValueGeneratedOnAdd();
 
         builder.Property(pedido => pedido.NomeCliente)
+            .HasColumnType("varchar(60)")
             .HasMaxLength(60)
+            .IsUnicode(false)
             .IsRequired();
 
         builder.Property(pedido => pedido.EmailCliente)
+            .HasColumnType("varchar(60)")
             .HasMaxLength(60)
+            .IsUnicode(false)
             .IsRequired();
 
         builder.Property(pedido => pedido.DataCriacao)
-            .HasColumnType("datetime2")
+            .HasColumnType("datetime")
             .IsRequired();
 
         builder.Property(pedido => pedido.Pago)

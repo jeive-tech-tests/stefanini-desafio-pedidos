@@ -1,4 +1,5 @@
 using Stefanini.Pedidos.Domain.Entities;
+using Stefanini.Pedidos.Domain.Exceptions;
 
 namespace Stefanini.Pedidos.UnitTests.Domain;
 
@@ -14,5 +15,21 @@ public sealed class ItemPedidoTests
 
         Assert.Equal(10.00m, item.ValorUnitario);
         Assert.Equal(20.00m, item.Subtotal);
+    }
+
+    [Fact]
+    public void CriarItem_ComProdutoNulo_DeveRejeitar()
+    {
+        Assert.Throws<DomainException>(() => new ItemPedido(null!, 1));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void CriarItem_ComQuantidadeNaoPositiva_DeveRejeitar(int quantidade)
+    {
+        var produto = new Produto("Produto", 10m);
+
+        Assert.Throws<DomainException>(() => new ItemPedido(produto, quantidade));
     }
 }

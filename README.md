@@ -14,7 +14,7 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 - respostas de erro padronizadas com `ProblemDetails`;
 - Swagger/OpenAPI;
 - migration e catálogo inicial de produtos;
-- testes unitários dos fluxos obrigatórios de GET e POST;
+- testes unitários e de integração dos fluxos de pedidos, produtos e armazenamento;
 - frontend integrado à API;
 - imagem única da aplicação e SQL Server no Docker Compose.
 
@@ -267,7 +267,7 @@ Erros são retornados no formato `application/problem+json`:
 
 ## Migrations e produtos iniciais
 
-A migration inicial cria as tabelas `Pedidos`, `ItensPedido` e `Produtos`, suas chaves e índices. Também cadastra cinco produtos para uso imediato: Notebook, Monitor, Teclado, Mouse e Headset.
+A migration inicial cria as tabelas `Pedidos`, `ItensPedido` e `Produtos`, suas chaves e índices. Também cadastra cinco produtos para uso imediato: Notebook, Monitor, Teclado, Mouse e Headset. A migration `AlinhaModelagemDesafio` preserva bancos existentes enquanto ajusta os tipos `varchar`/`datetime` e os nomes `IdPedido`/`IdProduto` para refletir literalmente a modelagem do desafio.
 
 Criar uma nova migration:
 
@@ -287,6 +287,7 @@ Backend:
 
 ```bash
 dotnet test Stefanini.Pedidos.sln
+dotnet test Stefanini.Pedidos.sln --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 dotnet list Stefanini.Pedidos.sln package --vulnerable --include-transitive
 ```
 
@@ -296,11 +297,12 @@ Frontend:
 cd src/Stefanini.Pedidos.Webapp
 npm run format:check
 npm run test:ci
+npm run test:coverage
 npm run build
 npm audit --audit-level=high
 ```
 
-O workflow de integração contínua em `.github/workflows/ci.yml` executa essas verificações em pushes e pull requests para `main` e `developer`.
+Os testes backend incluem unidades de domínio, serviços e controllers, além de integração do pipeline HTTP completo com banco isolado em memória. No frontend, a suíte cobre serviços HTTP, formulários reativos, cálculos, validações, tratamento de erros e componentes compartilhados. O workflow de integração contínua em `.github/workflows/ci.yml` executa testes com cobertura em pushes e pull requests para `main` e `developer`.
 
 ## Decisões técnicas
 

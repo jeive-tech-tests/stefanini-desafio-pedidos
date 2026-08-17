@@ -14,7 +14,9 @@ internal sealed class ProdutoConfiguration : IEntityTypeConfiguration<Produto>
         builder.Property(produto => produto.Id).ValueGeneratedOnAdd();
 
         builder.Property(produto => produto.NomeProduto)
+            .HasColumnType("varchar(20)")
             .HasMaxLength(20)
+            .IsUnicode(false)
             .IsRequired();
 
         builder.Property(produto => produto.Valor)

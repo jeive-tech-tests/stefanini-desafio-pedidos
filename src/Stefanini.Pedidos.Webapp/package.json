@@ -9,7 +9,8 @@
     "format:check": "prettier --check .",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false"
+    "test:ci": "ng test --watch=false",
+    "test:coverage": "ng test --watch=false --coverage --coverage-include=src/app/**/*.ts --coverage-exclude=src/app/**/*.spec.ts --coverage-reporters=text-summary --coverage-reporters=html"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
@@ -34,6 +35,7 @@
     "@angular/cli": "^21.2.0",
     "@angular/compiler-cli": "^21.2.0",
     "@tailwindcss/postcss": "^4.3.3",
+    "@vitest/coverage-v8": "^4.1.10",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.26",
     "prettier": "^3.8.1",

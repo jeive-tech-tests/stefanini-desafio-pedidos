@@ -17,6 +17,12 @@ internal sealed class ItemPedidoConfiguration : IEntityTypeConfiguration<ItemPed
             .HasColumnType("decimal(10,2)")
             .IsRequired();
 
+        builder.Property(item => item.PedidoId)
+            .HasColumnName("IdPedido");
+
+        builder.Property(item => item.ProdutoId)
+            .HasColumnName("IdProduto");
+
         builder.Property(item => item.Quantidade).IsRequired();
         builder.Ignore(item => item.Subtotal);
 

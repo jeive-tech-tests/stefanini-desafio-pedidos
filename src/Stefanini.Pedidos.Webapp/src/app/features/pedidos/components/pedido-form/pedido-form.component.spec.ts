@@ -1,5 +1,29 @@
+import { Signal, SimpleChange } from '@angular/core';
+import { FormArray, FormGroup } from '@angular/forms';
 import { TestBed } from '@angular/core/testing';
+import { Pedido } from '../../models/pedido.model';
+import { Produto } from '../../models/produto.model';
+import { PedidoItemFormGroup } from '../pedido-item-form/pedido-item-form.component';
 import { PedidoFormComponent } from './pedido-form.component';
+
+interface PedidoFormHarness {
+  form: FormGroup;
+  itens: FormArray<PedidoItemFormGroup>;
+  erro: Signal<string | null>;
+  totalEstimado: Signal<number>;
+  adicionarItem(idProduto?: number | null, quantidade?: number): void;
+  removerItem(index: number): void;
+  salvar(): void;
+}
+
+const produtos: Produto[] = [
+  { id: 1, nomeProduto: 'Notebook', valor: 100, imagemUrl: '/notebook.svg' },
+  { id: 2, nomeProduto: 'Mouse', valor: 25, imagemUrl: '/mouse.svg' },
+];
+
+function harness(component: PedidoFormComponent): PedidoFormHarness {
+  return component as unknown as PedidoFormHarness;
+}
 
 describe('PedidoFormComponent', () => {
   beforeEach(async () => {
@@ -24,5 +48,108 @@ describe('PedidoFormComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelectorAll('app-pedido-item-form')).toHaveLength(1);
+  });
+
+  it('envia um pedido válido normalizando os dados do cliente', () => {
+    const fixture = TestBed.createComponent(PedidoFormComponent);
+    const emitted = vi.fn();
+    fixture.componentInstance.produtos = produtos;
+    fixture.componentInstance.submitted.subscribe(emitted);
+    fixture.detectChanges();
+    const component = harness(fixture.componentInstance);
+    component.form.patchValue({
+      nomeCliente: '  Maria da Silva  ',
+      emailCliente: 'maria@example.com',
+      pago: true,
+    });
+    component.itens.at(0).setValue({ idProduto: 1, quantidade: 2 });
+
+    component.salvar();
+
+    expect(emitted).toHaveBeenCalledWith({
+      nomeCliente: 'Maria da Silva',
+      emailCliente: 'maria@example.com',
+      pago: true,
+      itensPedido: [{ idProduto: 1, quantidade: 2 }],
+    });
+  });
+
+  it('calcula o total estimado ao alterar produtos e quantidades', () => {
+    const fixture = TestBed.createComponent(PedidoFormComponent);
+    fixture.componentInstance.produtos = produtos;
+    fixture.detectChanges();
+    const component = harness(fixture.componentInstance);
+
+    component.itens.at(0).setValue({ idProduto: 1, quantidade: 2 });
+    component.adicionarItem(2, 4);
+
+    expect(component.totalEstimado()).toBe(300);
+  });
+
+  it('rejeita produtos duplicados', () => {
+    const fixture = TestBed.createComponent(PedidoFormComponent);
+    const emitted = vi.fn();
+    fixture.componentInstance.produtos = produtos;
+    fixture.componentInstance.submitted.subscribe(emitted);
+    fixture.detectChanges();
+    const component = harness(fixture.componentInstance);
+    component.form.patchValue({
+      nomeCliente: 'Maria',
+      emailCliente: 'maria@example.com',
+    });
+    component.itens.at(0).setValue({ idProduto: 1, quantidade: 1 });
+    component.adicionarItem(1, 2);
+
+    component.salvar();
+
+    expect(emitted).not.toHaveBeenCalled();
+    expect(component.erro()).toContain('apenas uma vez');
+  });
+
+  it('não permite remover o único item', () => {
+    const fixture = TestBed.createComponent(PedidoFormComponent);
+    fixture.detectChanges();
+    const component = harness(fixture.componentInstance);
+
+    component.removerItem(0);
+
+    expect(component.itens.length).toBe(1);
+    expect(component.erro()).toContain('ao menos um item');
+  });
+
+  it('preenche o formulário ao editar um pedido', () => {
+    const fixture = TestBed.createComponent(PedidoFormComponent);
+    fixture.componentInstance.produtos = produtos;
+    fixture.detectChanges();
+    const pedido: Pedido = {
+      id: 42,
+      nomeCliente: 'Cliente Atual',
+      emailCliente: 'atual@example.com',
+      pago: true,
+      valorTotal: 50,
+      itensPedido: [
+        {
+          id: 10,
+          idProduto: 2,
+          nomeProduto: 'Mouse',
+          valorUnitario: 25,
+          quantidade: 2,
+        },
+      ],
+    };
+
+    fixture.componentInstance.pedido = pedido;
+    fixture.componentInstance.ngOnChanges({
+      pedido: new SimpleChange(null, pedido, false),
+    });
+
+    const component = harness(fixture.componentInstance);
+    expect(component.form.getRawValue()).toEqual({
+      nomeCliente: 'Cliente Atual',
+      emailCliente: 'atual@example.com',
+      pago: true,
+      itensPedido: [{ idProduto: 2, quantidade: 2 }],
+    });
+    expect(component.totalEstimado()).toBe(50);
   });
 });

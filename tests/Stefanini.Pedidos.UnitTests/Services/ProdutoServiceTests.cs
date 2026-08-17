@@ -44,4 +44,47 @@ public sealed class ProdutoServiceTests
             Arg.Any<string>(),
             Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task Listar_DeveMapearProdutosDoRepositorio()
+    {
+        _repository.ListarAsync(Arg.Any<CancellationToken>()).Returns(
+            [
+                PedidoBuilder.CriarProduto(1, "Notebook", 4_299.90m),
+                PedidoBuilder.CriarProduto(4, "Mouse", 129.90m)
+            ]);
+        var service = new ProdutoService(_repository, _storage);
+
+        IReadOnlyCollection<ProdutoResponse> resposta = await service.ListarAsync();
+
+        Assert.Collection(
+            resposta,
+            notebook =>
+            {
+                Assert.Equal(1, notebook.Id);
+                Assert.Equal("Notebook", notebook.NomeProduto);
+                Assert.Equal(4_299.90m, notebook.Valor);
+            },
+            mouse =>
+            {
+                Assert.Equal(4, mouse.Id);
+                Assert.Equal("Mouse", mouse.NomeProduto);
+                Assert.Equal(129.90m, mouse.Valor);
+            });
+    }
+
+    [Fact]
+    public async Task ObterImagem_QuandoStorageNaoEncontra_DeveLancarNotFound()
+    {
+        Produto produto = PedidoBuilder.CriarProduto(1, "Notebook", 100m);
+        _repository.ObterPorIdAsync(1, Arg.Any<CancellationToken>()).Returns(produto);
+        _storage.ObterAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns((ProdutoImagemResponse?)null);
+        var service = new ProdutoService(_repository, _storage);
+
+        NotFoundException excecao = await Assert.ThrowsAsync<NotFoundException>(
+            () => service.ObterImagemAsync(1));
+
+        Assert.Contains("Imagem", excecao.Message);
+    }
 }
