@@ -5,6 +5,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { Produto } from '../../models/produto.model';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
+import { UiProductImageComponent } from '../../../../shared/components/ui-product-image/ui-product-image.component';
 
 export type PedidoItemFormGroup = FormGroup<{
   idProduto: FormControl<number | null>;
@@ -26,7 +27,14 @@ export function createPedidoItemForm(
 
 @Component({
   selector: 'app-pedido-item-form',
-  imports: [CurrencyPipe, InputNumberModule, ReactiveFormsModule, SelectModule, UiButtonComponent],
+  imports: [
+    CurrencyPipe,
+    InputNumberModule,
+    ReactiveFormsModule,
+    SelectModule,
+    UiButtonComponent,
+    UiProductImageComponent,
+  ],
   templateUrl: './pedido-item-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -38,6 +46,9 @@ export class PedidoItemFormComponent {
 
   protected get unitPrice(): number {
     return this.produtos.find((p) => p.id === this.group.controls.idProduto.value)?.valor ?? 0;
+  }
+  protected get selectedProduct(): Produto | undefined {
+    return this.produtos.find((produto) => produto.id === this.group.controls.idProduto.value);
   }
   protected get subtotal(): number {
     return this.unitPrice * this.group.controls.quantidade.value;

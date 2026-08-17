@@ -26,9 +26,12 @@ import { LoadingComponent } from '../../../../shared/components/loading/loading.
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
 import { UiTableComponent } from '../../../../shared/components/ui-table/ui-table.component';
+import { UiProductImageComponent } from '../../../../shared/components/ui-product-image/ui-product-image.component';
 import { Pedido } from '../../models/pedido.model';
 import { PedidosQuery } from '../../models/pedidos-query.model';
 import { PedidoService } from '../../services/pedido.service';
+import { ProdutoService } from '../../services/produto.service';
+import { Produto } from '../../models/produto.model';
 
 type StatusFiltro = 'todos' | 'pago' | 'pendente';
 
@@ -48,6 +51,7 @@ type StatusFiltro = 'todos' | 'pago' | 'pendente';
     UiButtonComponent,
     UiCardComponent,
     UiTableComponent,
+    UiProductImageComponent,
   ],
   templateUrl: './pedido-list.component.html',
   providers: [ConfirmationService],
@@ -55,11 +59,13 @@ type StatusFiltro = 'todos' | 'pago' | 'pendente';
 })
 export class PedidoListComponent implements OnInit {
   private readonly pedidosService = inject(PedidoService);
+  private readonly produtosService = inject(ProdutoService);
   private readonly notifications = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly confirmationService = inject(ConfirmationService);
 
   protected readonly pedidos = signal<Pedido[]>([]);
+  protected readonly produtos = signal<Produto[]>([]);
   protected readonly carregando = signal(true);
   protected readonly erro = signal<string | null>(null);
   protected readonly removendoId = signal<number | null>(null);
@@ -89,6 +95,14 @@ export class PedidoListComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.produtosService
+      .listar()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (produtos) => this.produtos.set(produtos),
+        error: () => undefined,
+      });
+
     this.filtros.valueChanges
       .pipe(debounceTime(350), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
@@ -164,6 +178,10 @@ export class PedidoListComponent implements OnInit {
 
   protected percentual(quantidade: number): number {
     return this.pedidos().length === 0 ? 0 : Math.round((quantidade / this.pedidos().length) * 100);
+  }
+
+  protected imagemProduto(idProduto: number): string {
+    return this.produtos().find((produto) => produto.id === idProduto)?.imagemUrl ?? '';
   }
 
   private executarRemocao(pedido: Pedido): void {

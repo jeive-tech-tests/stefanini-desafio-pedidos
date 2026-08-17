@@ -1,4 +1,43 @@
 services:
+  minio:
+    image: minio/minio:latest
+    container_name: stefanini-pedidos-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:-pedidosadmin}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:-Pedidos@2026Minio}"
+    ports:
+      - "127.0.0.1:${MINIO_API_PORT:-9000}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: stefanini-pedidos-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:-pedidosadmin}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:-Pedidos@2026Minio}"
+    volumes:
+      - ./deploy/minio/produtos:/seed:ro
+    entrypoint: >-
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
+      mc mb --ignore-existing local/produtos;
+      mc anonymous set download local/produtos;
+      mc mirror --overwrite /seed local/produtos;
+      "
+    restart: "no"
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: stefanini-pedidos-sqlserver
@@ -32,13 +71,18 @@ services:
       ASPNETCORE_HTTP_PORTS: "8080"
       Database__ApplyMigrationsOnStartup: "true"
       Hosting__PathBase: "/stefanini-desafio-pedidos"
+      Minio__Endpoint: "http://minio:9000"
+      Minio__Bucket: "produtos"
       ConnectionStrings__PedidosDb: "Server=sqlserver,1433;Database=StefaniniPedidos;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Pedidos@2026Dev};TrustServerCertificate=True"
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
       sqlserver:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     restart: unless-stopped
 
 volumes:
   sqlserver-data:
+  minio-data:

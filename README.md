@@ -28,6 +28,7 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 | Documentação da API | Swagger/OpenAPI                                           |
 | Frontend            | Angular 21, PrimeNG 21, Tailwind CSS 4, TypeScript 5.9, RxJS |
 | Testes              | xUnit, NSubstitute e Vitest                               |
+| Objetos             | MinIO para imagens dos produtos                           |
 | Infraestrutura      | Docker e Docker Compose                                   |
 
 ## Arquitetura
@@ -39,13 +40,14 @@ flowchart LR
     APP --> DOMAIN[Domain]
     APP --> INFRA[Infrastructure]
     INFRA --> DB[(SQL Server)]
+    API --> MINIO[(MinIO)]
 ```
 
 As dependências apontam para o centro da aplicação:
 
 - **Domain** concentra entidades, invariantes e regras de negócio;
 - **Application** contém casos de uso, contratos, DTOs e serviços;
-- **Infrastructure** implementa persistência com EF Core e SQL Server;
+- **Infrastructure** implementa persistência com EF Core e SQL Server e acesso às imagens no MinIO;
 - **Api** expõe endpoints REST, Swagger e tratamento global de erros;
 - **Webapp** entrega a experiência de listagem e manutenção dos pedidos com organização feature-first.
 
@@ -82,8 +84,9 @@ Pré-requisito: Docker Desktop ou Docker Engine com Compose.
    - aplicação: <http://localhost:8080/stefanini-desafio-pedidos/>
    - Swagger: <http://localhost:8080/stefanini-desafio-pedidos/swagger>
    - health check interno: <http://localhost:8080/health>
+   - console local do MinIO: <http://localhost:9001> (`pedidosadmin` / `Pedidos@2026Minio` no ambiente de desenvolvimento)
 
-O container da aplicação aguarda o SQL Server ficar saudável, aplica as migrations automaticamente e serve o build do Angular pela própria API. Os dados permanecem no volume `sqlserver-data`.
+O container da aplicação aguarda o SQL Server e a inicialização do bucket do MinIO, aplica as migrations automaticamente e serve o build do Angular pela própria API. Os dados permanecem nos volumes `sqlserver-data` e `minio-data`. O serviço `minio-init` cria o bucket `produtos` e sincroniza as imagens iniciais de `deploy/minio/produtos` de forma idempotente.
 
 Para interromper os containers sem apagar os dados:
 
@@ -181,6 +184,7 @@ Acesse <http://localhost:4200>. O proxy de desenvolvimento encaminha `/api` para
 | `PUT`    | `/api/pedidos/{id}` | atualiza um pedido                    |
 | `DELETE` | `/api/pedidos/{id}` | exclui um pedido                      |
 | `GET`    | `/api/produtos`     | lista o catálogo de produtos          |
+| `GET`    | `/api/produtos/{id}/imagem` | entrega a imagem do produto armazenada no MinIO |
 
 Parâmetros opcionais da listagem:
 
@@ -304,6 +308,8 @@ O workflow de integração contínua em `.github/workflows/ci.yml` executa essas
 - Cálculos e validações essenciais permanecem no domínio e no backend; o frontend replica os cálculos apenas para feedback imediato.
 - Consultas de leitura usam `AsNoTracking`, enquanto os produtos usados em gravações permanecem rastreados pelo EF Core.
 - O frontend usa rotas lazy e serviços tipados, sem depender de uma URL externa fixa.
+- As imagens dos produtos ficam no MinIO e são entregues pela API; o Angular não conhece endereço, credencial ou bucket do storage.
+- O componente `ui-product-image` padroniza miniaturas circulares e a ampliação acessível por hover ou foco.
 - O layout responsivo usa exclusivamente utilitários do Tailwind CSS; PrimeNG fornece os componentes interativos e o tema Aura personalizado.
 - No deploy em container, Angular e API compartilham origem e porta; somente o SQL Server permanece como serviço separado e persistente.
 

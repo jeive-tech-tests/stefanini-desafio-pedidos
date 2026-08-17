@@ -21,11 +21,15 @@ internal sealed class ProdutoConfiguration : IEntityTypeConfiguration<Produto>
             .HasColumnType("decimal(10,2)")
             .IsRequired();
 
+        builder.Property(produto => produto.ImagemObjeto)
+            .HasMaxLength(100)
+            .IsRequired();
+
         builder.HasData(
-            new { Id = 1, NomeProduto = "Notebook", Valor = 4299.90m },
-            new { Id = 2, NomeProduto = "Monitor", Valor = 1199.90m },
-            new { Id = 3, NomeProduto = "Teclado", Valor = 249.90m },
-            new { Id = 4, NomeProduto = "Mouse", Valor = 129.90m },
-            new { Id = 5, NomeProduto = "Headset", Valor = 399.90m });
+            new { Id = 1, NomeProduto = "Notebook", Valor = 4299.90m, ImagemObjeto = "notebook.svg" },
+            new { Id = 2, NomeProduto = "Monitor", Valor = 1199.90m, ImagemObjeto = "monitor.svg" },
+            new { Id = 3, NomeProduto = "Teclado", Valor = 249.90m, ImagemObjeto = "teclado.svg" },
+            new { Id = 4, NomeProduto = "Mouse", Valor = 129.90m, ImagemObjeto = "mouse.svg" },
+            new { Id = 5, NomeProduto = "Headset", Valor = 399.90m, ImagemObjeto = "headset.svg" });
     }
 }
