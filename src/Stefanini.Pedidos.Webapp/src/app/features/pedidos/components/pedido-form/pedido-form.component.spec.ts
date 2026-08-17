@@ -52,6 +52,20 @@ describe('PedidoFormComponent', () => {
     expect(fixture.nativeElement.querySelectorAll('app-pedido-item-form')).toHaveLength(1);
   });
 
+  it('mantém a lista de itens em uma região com rolagem interna', () => {
+    const fixture = TestBed.createComponent(PedidoFormComponent);
+    fixture.detectChanges();
+
+    const lista = fixture.nativeElement.querySelector(
+      '[aria-label="Itens adicionados ao pedido"]',
+    ) as HTMLElement;
+
+    expect(lista).toBeTruthy();
+    expect(lista.classList.contains('max-h-[23rem]')).toBe(true);
+    expect(lista.classList.contains('overflow-y-auto')).toBe(true);
+    expect(lista.getAttribute('tabindex')).toBe('0');
+  });
+
   it('envia um pedido válido normalizando os dados do cliente', () => {
     const fixture = TestBed.createComponent(PedidoFormComponent);
     const emitted = vi.fn();

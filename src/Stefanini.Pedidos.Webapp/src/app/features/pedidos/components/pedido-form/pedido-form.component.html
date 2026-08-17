@@ -75,7 +75,13 @@
           <span>Produto</span><span>Valor unitário</span><span>Quantidade</span
           ><span class="text-right">Subtotal</span><span></span>
         </div>
-        <div formArrayName="itensPedido" class="mt-3 grid gap-3">
+        <div
+          formArrayName="itensPedido"
+          class="mt-3 grid max-h-[23rem] gap-3 overflow-y-auto overscroll-contain pr-2 focus-visible:rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          role="region"
+          aria-label="Itens adicionados ao pedido"
+          tabindex="0"
+        >
           @for (item of itens.controls; track item; let index = $index) {
             <app-pedido-item-form
               [group]="item"
