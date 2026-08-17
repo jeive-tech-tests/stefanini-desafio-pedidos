@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -12,6 +13,11 @@ builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddHealthChecks();
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto;
+});
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -64,15 +70,39 @@ if (app.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"))
     await dbContext.Database.MigrateAsync();
 }
 
+app.UseForwardedHeaders();
+
+string pathBase = app.Configuration["Hosting:PathBase"]?.TrimEnd('/') ?? string.Empty;
+
+if (!string.IsNullOrWhiteSpace(pathBase))
+{
+    if (!pathBase.StartsWith('/'))
+    {
+        throw new InvalidOperationException("O PathBase deve começar com '/'.");
+    }
+
+    app.UsePathBase(pathBase);
+}
+
 app.UseExceptionHandler();
 app.UseStaticFiles();
-app.UseSwagger();
+app.UseSwagger(options =>
+{
+    options.PreSerializeFilters.Add((document, request) =>
+    {
+        if (request.PathBase.HasValue)
+        {
+            document.Servers = [new OpenApiServer { Url = request.PathBase.Value! }];
+        }
+    });
+});
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Stefanini - API de Pedidos v1");
+    options.SwaggerEndpoint("v1/swagger.json", "Stefanini - API de Pedidos v1");
     options.RoutePrefix = "swagger";
 });
 
+app.UseRouting();
 app.UseCors("Frontend");
 app.UseAuthorization();
 app.MapControllers();

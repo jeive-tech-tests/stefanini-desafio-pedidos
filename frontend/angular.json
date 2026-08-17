@@ -34,6 +34,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/stefanini-desafio-pedidos/",
               "budgets": [
                 {
                   "type": "initial",

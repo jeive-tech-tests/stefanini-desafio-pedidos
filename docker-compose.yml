@@ -7,7 +7,7 @@ services:
       MSSQL_PID: "Developer"
       MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-Pedidos@2026Dev}"
     ports:
-      - "127.0.0.1:1433:1433"
+      - "127.0.0.1:${MSSQL_HOST_PORT:-1433}:1433"
     volumes:
       - sqlserver-data:/var/opt/mssql
     healthcheck:
@@ -31,9 +31,10 @@ services:
       ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_HTTP_PORTS: "8080"
       Database__ApplyMigrationsOnStartup: "true"
+      Hosting__PathBase: "/stefanini-desafio-pedidos"
       ConnectionStrings__PedidosDb: "Server=sqlserver,1433;Database=StefaniniPedidos;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Pedidos@2026Dev};TrustServerCertificate=True"
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     depends_on:
       sqlserver:
         condition: service_healthy
