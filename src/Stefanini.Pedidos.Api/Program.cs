@@ -1,14 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Stefanini.Pedidos.Api.ExceptionHandling;
 using Stefanini.Pedidos.Application;
 using Stefanini.Pedidos.Infrastructure;
+using Stefanini.Pedidos.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddHealthChecks();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -54,7 +57,15 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+if (app.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"))
+{
+    await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
+    PedidosDbContext dbContext = scope.ServiceProvider.GetRequiredService<PedidosDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
 app.UseExceptionHandler();
+app.UseStaticFiles();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
@@ -65,8 +76,36 @@ app.UseSwaggerUI(options =>
 app.UseCors("Frontend");
 app.UseAuthorization();
 app.MapControllers();
-app.MapGet("/", () => Results.Redirect("/swagger"))
+app.MapHealthChecks("/health");
+app.MapGet("/", (IWebHostEnvironment environment) =>
+    {
+        string indexFile = Path.Combine(environment.WebRootPath ?? string.Empty, "index.html");
+        return File.Exists(indexFile)
+            ? Results.File(indexFile, "text/html; charset=utf-8")
+            : Results.Redirect("/swagger");
+    })
     .ExcludeFromDescription();
+app.MapFallback(async context =>
+{
+    if (context.Request.Path.StartsWithSegments("/api") ||
+        context.Request.Path.StartsWithSegments("/swagger") ||
+        context.Request.Path.StartsWithSegments("/health"))
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        return;
+    }
+
+    string indexFile = Path.Combine(app.Environment.WebRootPath ?? string.Empty, "index.html");
+
+    if (!File.Exists(indexFile))
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        return;
+    }
+
+    context.Response.ContentType = "text/html; charset=utf-8";
+    await context.Response.SendFileAsync(indexFile);
+});
 
 app.Run();
 
