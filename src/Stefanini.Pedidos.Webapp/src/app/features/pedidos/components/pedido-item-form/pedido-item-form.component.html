@@ -8,8 +8,9 @@
       @if (selectedProduct; as product) {
         <app-ui-product-image [src]="product.imagemUrl" [alt]="product.nomeProduto" size="sm" />
       }
-      <p-select
+      <app-ui-select
         class="min-w-0 flex-1"
+        selectClass="w-full"
         formControlName="idProduto"
         [options]="produtos"
         optionLabel="nomeProduto"
@@ -17,7 +18,7 @@
         placeholder="Selecione um produto"
         appendTo="body"
         [invalid]="group.controls.idProduto.touched && group.controls.idProduto.invalid"
-        [attr.aria-label]="'Produto do item ' + (index + 1)"
+        [ariaLabel]="'Produto do item ' + (index + 1)"
       />
     </div>
     @if (group.controls.idProduto.touched && group.controls.idProduto.invalid) {
@@ -32,8 +33,8 @@
   </div>
   <label
     ><span class="mb-2 block text-xs font-semibold text-slate-500 lg:hidden">Quantidade</span
-    ><p-inputnumber
-      class="w-full"
+    ><app-ui-input-number
+      inputClass="w-full"
       formControlName="quantidade"
       [min]="1"
       [showButtons]="true"
@@ -41,7 +42,7 @@
       incrementButtonIcon="pi pi-plus"
       decrementButtonIcon="pi pi-minus"
       [invalid]="group.controls.quantidade.touched && group.controls.quantidade.invalid"
-      [attr.aria-label]="'Quantidade do item ' + (index + 1)"
+      [ariaLabel]="'Quantidade do item ' + (index + 1)"
   /></label>
   <div class="lg:text-right">
     <span class="mb-2 block text-xs font-semibold text-slate-500 lg:hidden">Subtotal</span

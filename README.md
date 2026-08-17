@@ -51,7 +51,7 @@ As dependências apontam para o centro da aplicação:
 - **Api** expõe endpoints REST, Swagger e tratamento global de erros;
 - **Webapp** entrega a experiência de listagem e manutenção dos pedidos com organização feature-first.
 
-No Angular, `core` concentra configuração transversal, interceptadores e notificações; `layout` contém o shell visual; `shared` reúne o design system reutilizável; e `features/pedidos` mantém páginas, componentes, modelos e serviços do domínio de pedidos próximos entre si. As rotas da feature são carregadas sob demanda, e criação e edição compartilham o mesmo formulário reativo com `FormArray` para os itens. Botões, cards, tabelas e modais são padronizados por `ui-button`, `ui-card`, `ui-table` e `ui-modal`; a criação de pedido usa o modal compartilhado sobre a listagem.
+No Angular, `core` concentra configuração transversal, interceptadores e notificações; `layout` contém o shell visual; `shared` reúne o design system reutilizável; e `features/pedidos` mantém páginas, componentes, modelos e serviços do domínio de pedidos próximos entre si. As rotas da feature são carregadas sob demanda, e criação e edição compartilham o mesmo formulário reativo com `FormArray` para os itens. Os componentes visuais do PrimeNG são encapsulados na camada compartilhada por componentes `ui-*`, incluindo botões, cards, tabelas, modais, campos, seletores, mensagens e feedbacks; assim, páginas e componentes de domínio não dependem diretamente dos módulos visuais da biblioteca.
 
 ```text
 src/Stefanini.Pedidos.Webapp/src/app/

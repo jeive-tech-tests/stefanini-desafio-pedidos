@@ -11,22 +11,25 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { MessageModule } from 'primeng/message';
-import { PaginatorState } from 'primeng/paginator';
-import { SelectModule } from 'primeng/select';
-import { TagModule } from 'primeng/tag';
 import { debounceTime, finalize } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { mensagemErroHttp } from '../../../../shared/utils/http-error';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
-import { LoadingComponent } from '../../../../shared/components/loading/loading.component';
+import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiCardComponent } from '../../../../shared/components/ui-card/ui-card.component';
-import { UiTableComponent } from '../../../../shared/components/ui-table/ui-table.component';
+import {
+  UiPageChange,
+  UiTableComponent,
+} from '../../../../shared/components/ui-table/ui-table.component';
 import { UiProductImageComponent } from '../../../../shared/components/ui-product-image/ui-product-image.component';
+import {
+  UiConfirmDialogComponent,
+  UiConfirmationService,
+} from '../../../../shared/components/ui-confirm-dialog/ui-confirm-dialog.component';
+import { UiInputComponent } from '../../../../shared/components/ui-input/ui-input.component';
+import { UiSelectComponent } from '../../../../shared/components/ui-select/ui-select.component';
+import { UiTagComponent } from '../../../../shared/components/ui-tag/ui-tag.component';
 import { Pedido } from '../../models/pedido.model';
 import { PedidosQuery } from '../../models/pedidos-query.model';
 import { PedidoService } from '../../services/pedido.service';
@@ -38,23 +41,21 @@ type StatusFiltro = 'todos' | 'pago' | 'pendente';
 @Component({
   selector: 'app-pedido-list',
   imports: [
-    ConfirmDialogModule,
     CurrencyPipe,
-    InputTextModule,
-    MessageModule,
     ReactiveFormsModule,
     RouterLink,
-    SelectModule,
-    TagModule,
     EmptyStateComponent,
-    LoadingComponent,
+    UiLoadingComponent,
     UiButtonComponent,
     UiCardComponent,
+    UiConfirmDialogComponent,
+    UiInputComponent,
+    UiSelectComponent,
     UiTableComponent,
     UiProductImageComponent,
+    UiTagComponent,
   ],
   templateUrl: './pedido-list.component.html',
-  providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoListComponent implements OnInit {
@@ -62,7 +63,7 @@ export class PedidoListComponent implements OnInit {
   private readonly produtosService = inject(ProdutoService);
   private readonly notifications = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly confirmationService = inject(ConfirmationService);
+  private readonly confirmationService = inject(UiConfirmationService);
 
   protected readonly pedidos = signal<Pedido[]>([]);
   protected readonly produtos = signal<Produto[]>([]);
@@ -146,7 +147,7 @@ export class PedidoListComponent implements OnInit {
     this.filtros.setValue({ nomeCliente: '', status: 'todos' });
   }
 
-  protected alterarPagina(evento: PaginatorState): void {
+  protected alterarPagina(evento: UiPageChange): void {
     const novaPagina = (evento.page ?? 0) + 1;
     const novoTamanho = evento.rows ?? this.tamanhoPagina();
 

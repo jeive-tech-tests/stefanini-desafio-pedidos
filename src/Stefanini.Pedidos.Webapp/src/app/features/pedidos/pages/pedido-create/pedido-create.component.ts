@@ -9,7 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
-import { LoadingComponent } from '../../../../shared/components/loading/loading.component';
+import { UiLoadingComponent } from '../../../../shared/components/ui-loading/ui-loading.component';
 import { UiModalComponent } from '../../../../shared/components/ui-modal/ui-modal.component';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { PedidoFormComponent } from '../../components/pedido-form/pedido-form.component';
@@ -21,7 +21,7 @@ import { PedidoListComponent } from '../pedido-list/pedido-list.component';
 
 @Component({
   selector: 'app-pedido-create',
-  imports: [LoadingComponent, PedidoFormComponent, PedidoListComponent, UiModalComponent],
+  imports: [PedidoFormComponent, PedidoListComponent, UiLoadingComponent, UiModalComponent],
   templateUrl: './pedido-create.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
