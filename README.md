@@ -14,7 +14,7 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 - respostas de erro padronizadas com `ProblemDetails`;
 - Swagger/OpenAPI;
 - migration e catálogo inicial de produtos;
-- testes unitários dos fluxos obrigatórios de GET e POST;
+- testes unitários e de integração dos fluxos de pedidos, produtos e armazenamento;
 - frontend integrado à API;
 - imagem única da aplicação e SQL Server no Docker Compose.
 
@@ -26,8 +26,9 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 | Arquitetura         | Clean Architecture, DDD tático, Repository e Unit of Work |
 | Banco de dados      | SQL Server 2022                                           |
 | Documentação da API | Swagger/OpenAPI                                           |
-| Frontend            | Angular 22, TypeScript 6, RxJS                            |
+| Frontend            | Angular 21, PrimeNG 21, Tailwind CSS 4, TypeScript 5.9, RxJS |
 | Testes              | xUnit, NSubstitute e Vitest                               |
+| Objetos             | MinIO para imagens dos produtos                           |
 | Infraestrutura      | Docker e Docker Compose                                   |
 
 ## Arquitetura
@@ -39,15 +40,26 @@ flowchart LR
     APP --> DOMAIN[Domain]
     APP --> INFRA[Infrastructure]
     INFRA --> DB[(SQL Server)]
+    API --> MINIO[(MinIO)]
 ```
 
 As dependências apontam para o centro da aplicação:
 
 - **Domain** concentra entidades, invariantes e regras de negócio;
 - **Application** contém casos de uso, contratos, DTOs e serviços;
-- **Infrastructure** implementa persistência com EF Core e SQL Server;
+- **Infrastructure** implementa persistência com EF Core e SQL Server e acesso às imagens no MinIO;
 - **Api** expõe endpoints REST, Swagger e tratamento global de erros;
-- **frontend** entrega a experiência de listagem e manutenção dos pedidos.
+- **Webapp** entrega a experiência de listagem e manutenção dos pedidos com organização feature-first.
+
+No Angular, `core` concentra configuração transversal, interceptadores e notificações; `layout` contém o shell visual; `shared` reúne o design system reutilizável; e `features/pedidos` mantém páginas, componentes, modelos e serviços do domínio de pedidos próximos entre si. As rotas da feature são carregadas sob demanda, e criação e edição compartilham o mesmo formulário reativo com `FormArray` para os itens. Os componentes visuais do PrimeNG são encapsulados na camada compartilhada por componentes `ui-*`, incluindo botões, cards, tabelas, modais, campos, seletores, mensagens e feedbacks; assim, páginas e componentes de domínio não dependem diretamente dos módulos visuais da biblioteca.
+
+```text
+src/Stefanini.Pedidos.Webapp/src/app/
+├── core/                  # configuração, interceptor e notificações
+├── layout/                # header e shell da aplicação
+├── shared/                # design system, estados visuais e utilitários
+└── features/pedidos/      # componentes, páginas, modelos, rotas e serviços HTTP
+```
 
 ## Executar tudo com Docker
 
@@ -72,8 +84,9 @@ Pré-requisito: Docker Desktop ou Docker Engine com Compose.
    - aplicação: <http://localhost:8080/stefanini-desafio-pedidos/>
    - Swagger: <http://localhost:8080/stefanini-desafio-pedidos/swagger>
    - health check interno: <http://localhost:8080/health>
+   - console local do MinIO: <http://localhost:9001> (`pedidosadmin` / `Pedidos@2026Minio` no ambiente de desenvolvimento)
 
-O container da aplicação aguarda o SQL Server ficar saudável, aplica as migrations automaticamente e serve o build do Angular pela própria API. Os dados permanecem no volume `sqlserver-data`.
+O container da aplicação aguarda o SQL Server e a inicialização do bucket do MinIO, aplica as migrations automaticamente e serve o build do Angular pela própria API. Os dados permanecem nos volumes `sqlserver-data` e `minio-data`. O serviço `minio-init` cria o bucket `produtos` e sincroniza as imagens iniciais de `deploy/minio/produtos` de forma idempotente.
 
 Para interromper os containers sem apagar os dados:
 
@@ -154,7 +167,7 @@ Server=localhost,1433;Database=StefaniniPedidos;User Id=sa;Password=Pedidos@2026
 Pré-requisito: Node.js 24 com npm.
 
 ```bash
-cd frontend
+cd src/Stefanini.Pedidos.Webapp
 npm ci
 npm start
 ```
@@ -171,6 +184,7 @@ Acesse <http://localhost:4200>. O proxy de desenvolvimento encaminha `/api` para
 | `PUT`    | `/api/pedidos/{id}` | atualiza um pedido                    |
 | `DELETE` | `/api/pedidos/{id}` | exclui um pedido                      |
 | `GET`    | `/api/produtos`     | lista o catálogo de produtos          |
+| `GET`    | `/api/produtos/{id}/imagem` | entrega a imagem do produto armazenada no MinIO |
 
 Parâmetros opcionais da listagem:
 
@@ -253,7 +267,7 @@ Erros são retornados no formato `application/problem+json`:
 
 ## Migrations e produtos iniciais
 
-A migration inicial cria as tabelas `Pedidos`, `ItensPedido` e `Produtos`, suas chaves e índices. Também cadastra cinco produtos para uso imediato: Notebook, Monitor, Teclado, Mouse e Headset.
+A migration inicial cria as tabelas `Pedidos`, `ItensPedido` e `Produtos`, suas chaves e índices. Também cadastra cinco produtos para uso imediato: Notebook, Monitor, Teclado, Mouse e Headset. A migration `AlinhaModelagemDesafio` preserva bancos existentes enquanto ajusta os tipos `varchar`/`datetime` e os nomes `IdPedido`/`IdProduto` para refletir literalmente a modelagem do desafio.
 
 Criar uma nova migration:
 
@@ -273,20 +287,22 @@ Backend:
 
 ```bash
 dotnet test Stefanini.Pedidos.sln
+dotnet test Stefanini.Pedidos.sln --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 dotnet list Stefanini.Pedidos.sln package --vulnerable --include-transitive
 ```
 
 Frontend:
 
 ```bash
-cd frontend
+cd src/Stefanini.Pedidos.Webapp
 npm run format:check
 npm run test:ci
+npm run test:coverage
 npm run build
 npm audit --audit-level=high
 ```
 
-O workflow de integração contínua em `.github/workflows/ci.yml` executa essas verificações em pushes e pull requests para `main` e `developer`.
+Os testes backend incluem unidades de domínio, serviços e controllers, além de integração do pipeline HTTP completo com banco isolado em memória. No frontend, a suíte cobre serviços HTTP, formulários reativos, cálculos, validações, tratamento de erros e componentes compartilhados. O workflow de integração contínua em `.github/workflows/ci.yml` executa testes com cobertura em pushes e pull requests para `main` e `developer`.
 
 ## Decisões técnicas
 
@@ -294,6 +310,9 @@ O workflow de integração contínua em `.github/workflows/ci.yml` executa essas
 - Cálculos e validações essenciais permanecem no domínio e no backend; o frontend replica os cálculos apenas para feedback imediato.
 - Consultas de leitura usam `AsNoTracking`, enquanto os produtos usados em gravações permanecem rastreados pelo EF Core.
 - O frontend usa rotas lazy e serviços tipados, sem depender de uma URL externa fixa.
+- As imagens dos produtos ficam no MinIO e são entregues pela API; o Angular não conhece endereço, credencial ou bucket do storage.
+- O componente `ui-product-image` padroniza miniaturas circulares e a ampliação acessível por hover ou foco.
+- O layout responsivo usa exclusivamente utilitários do Tailwind CSS; PrimeNG fornece os componentes interativos e o tema Aura personalizado.
 - No deploy em container, Angular e API compartilham origem e porta; somente o SQL Server permanece como serviço separado e persistente.
 
 ## Fluxo de branches
@@ -307,6 +326,7 @@ O desenvolvimento foi organizado a partir de `developer`, com branches por etapa
 - `feat/documentacao-deploy`;
 - `feat/deploy-main`;
 - `feat/dominio-jeive`;
-- `feat/versionamento-release`.
+- `feat/versionamento-release`;
+- `feat/frontend-primeng-tailwind`.
 
 Cada etapa possui commit próprio em português e merge explícito em `developer`.

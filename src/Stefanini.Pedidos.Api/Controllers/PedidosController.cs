@@ -7,7 +7,6 @@ namespace Stefanini.Pedidos.Api.Controllers;
 
 [ApiController]
 [Route("api/pedidos")]
-[Produces("application/json")]
 public sealed class PedidosController(IPedidoService pedidoService) : ControllerBase
 {
     [HttpPost]

@@ -1,0 +1,14 @@
+<input
+  pInputText
+  [type]="type"
+  [value]="value"
+  [placeholder]="placeholder"
+  [autocomplete]="autocomplete"
+  [attr.maxlength]="maxlength"
+  [invalid]="invalid"
+  [disabled]="disabled"
+  [class]="inputClass"
+  [attr.aria-label]="ariaLabel"
+  (input)="updateValue($event)"
+  (blur)="markAsTouched()"
+/>

@@ -8,10 +8,11 @@ public sealed class Produto
     {
     }
 
-    public Produto(string nomeProduto, decimal valor)
+    public Produto(string nomeProduto, decimal valor, string imagemObjeto = "produto-padrao.svg")
     {
         DefinirNome(nomeProduto);
         DefinirValor(valor);
+        DefinirImagem(imagemObjeto);
     }
 
     public int Id { get; private set; }
@@ -20,10 +21,17 @@ public sealed class Produto
 
     public decimal Valor { get; private set; }
 
-    public void Atualizar(string nomeProduto, decimal valor)
+    public string ImagemObjeto { get; private set; } = string.Empty;
+
+    public void Atualizar(string nomeProduto, decimal valor, string? imagemObjeto = null)
     {
         DefinirNome(nomeProduto);
         DefinirValor(valor);
+
+        if (imagemObjeto is not null)
+        {
+            DefinirImagem(imagemObjeto);
+        }
     }
 
     private void DefinirNome(string nomeProduto)
@@ -51,5 +59,17 @@ public sealed class Produto
         }
 
         Valor = decimal.Round(valor, 2, MidpointRounding.AwayFromZero);
+    }
+
+    private void DefinirImagem(string imagemObjeto)
+    {
+        var nomeNormalizado = imagemObjeto?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(nomeNormalizado) || nomeNormalizado.Length > 100)
+        {
+            throw new DomainException("O objeto da imagem do produto deve possuir até 100 caracteres.");
+        }
+
+        ImagemObjeto = nomeNormalizado;
     }
 }

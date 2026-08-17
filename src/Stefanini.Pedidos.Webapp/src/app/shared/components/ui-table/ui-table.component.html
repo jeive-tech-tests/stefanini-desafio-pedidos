@@ -1,0 +1,21 @@
+<p-table
+  [value]="value"
+  [dataKey]="dataKey"
+  responsiveLayout="stack"
+  breakpoint="960px"
+  styleClass="text-sm"
+>
+  <ng-template #header><ng-container [ngTemplateOutlet]="headerTemplate" /></ng-template>
+  <ng-template #body let-row
+    ><ng-container [ngTemplateOutlet]="rowTemplate" [ngTemplateOutletContext]="{ $implicit: row }"
+  /></ng-template>
+</p-table>
+<p-paginator
+  [first]="first"
+  [rows]="rows"
+  [totalRecords]="totalRecords"
+  [rowsPerPageOptions]="rowsPerPageOptions"
+  [showCurrentPageReport]="true"
+  [currentPageReportTemplate]="currentPageReportTemplate"
+  (onPageChange)="pageChange.emit($event)"
+/>

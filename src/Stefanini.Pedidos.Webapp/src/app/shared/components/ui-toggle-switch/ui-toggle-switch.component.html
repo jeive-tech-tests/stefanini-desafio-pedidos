@@ -1,0 +1,7 @@
+<p-toggleswitch
+  [ngModel]="value"
+  (ngModelChange)="updateValue($event)"
+  [disabled]="disabled"
+  [ariaLabel]="ariaLabel"
+  (onBlur)="markAsTouched()"
+/>

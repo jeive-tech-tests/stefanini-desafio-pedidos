@@ -1,0 +1,53 @@
+<header
+  class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95"
+>
+  <div class="mx-auto flex h-20 max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-10">
+    <a
+      class="flex shrink-0 items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      routerLink="/pedidos"
+      aria-label="Ir para pedidos"
+    >
+      <span
+        class="grid size-11 place-items-center rounded-xl bg-blue-600 text-xl text-white shadow-lg shadow-blue-600/20"
+        ><i class="pi pi-shopping-cart"></i
+      ></span>
+      <span class="hidden sm:block"
+        ><strong class="block text-base font-bold tracking-tight text-slate-950 dark:text-white"
+          >Pedidos</strong
+        ><small class="mt-0.5 block text-[11px] font-medium text-slate-500 dark:text-slate-400"
+          >CRUD · .NET & Angular</small
+        ></span
+      >
+    </a>
+    <nav class="ml-1 flex h-full items-stretch gap-1 sm:ml-8" aria-label="Navegação principal">
+      <a
+        class="relative flex items-center gap-2 px-3 text-sm font-semibold text-slate-600 transition hover:text-blue-600 sm:px-5 dark:text-slate-300"
+        routerLink="/pedidos"
+        routerLinkActive="text-blue-600 after:absolute after:inset-x-2 after:bottom-0 after:h-1 after:rounded-t-full after:bg-blue-600"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ><i class="pi pi-list"></i><span class="hidden sm:inline">Pedidos</span></a
+      >
+    </nav>
+    <div class="ml-auto flex items-center gap-1 sm:gap-2">
+      <app-ui-button
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        [icon]="darkTheme() ? 'pi pi-sun' : 'pi pi-moon'"
+        [ariaLabel]="darkTheme() ? 'Ativar tema claro' : 'Ativar tema escuro'"
+        [tooltip]="darkTheme() ? 'Tema claro' : 'Tema escuro'"
+        (clicked)="toggleTheme()"
+      />
+      <app-ui-button
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        icon="pi pi-external-link"
+        href="swagger"
+        target="_blank"
+        ariaLabel="Abrir Swagger"
+        tooltip="Abrir Swagger"
+      />
+    </div>
+  </div>
+</header>

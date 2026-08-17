@@ -31,10 +31,12 @@ namespace Stefanini.Pedidos.Infrastructure.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("PedidoId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("IdPedido");
 
                     b.Property<int>("ProdutoId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("IdProduto");
 
                     b.Property<int>("Quantidade")
                         .HasColumnType("int");
@@ -61,17 +63,19 @@ namespace Stefanini.Pedidos.Infrastructure.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("EmailCliente")
                         .IsRequired()
                         .HasMaxLength(60)
-                        .HasColumnType("nvarchar(60)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(60)");
 
                     b.Property<string>("NomeCliente")
                         .IsRequired()
                         .HasMaxLength(60)
-                        .HasColumnType("nvarchar(60)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(60)");
 
                     b.Property<bool>("Pago")
                         .HasColumnType("bit");
@@ -89,10 +93,16 @@ namespace Stefanini.Pedidos.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ImagemObjeto")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("NomeProduto")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<decimal>("Valor")
                         .HasColumnType("decimal(10,2)");
@@ -105,30 +115,35 @@ namespace Stefanini.Pedidos.Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = 1,
+                            ImagemObjeto = "notebook.svg",
                             NomeProduto = "Notebook",
                             Valor = 4299.90m
                         },
                         new
                         {
                             Id = 2,
+                            ImagemObjeto = "monitor.svg",
                             NomeProduto = "Monitor",
                             Valor = 1199.90m
                         },
                         new
                         {
                             Id = 3,
+                            ImagemObjeto = "teclado.svg",
                             NomeProduto = "Teclado",
                             Valor = 249.90m
                         },
                         new
                         {
                             Id = 4,
+                            ImagemObjeto = "mouse.svg",
                             NomeProduto = "Mouse",
                             Valor = 129.90m
                         },
                         new
                         {
                             Id = 5,
+                            ImagemObjeto = "headset.svg",
                             NomeProduto = "Headset",
                             Valor = 399.90m
                         });

@@ -1,0 +1,138 @@
+@if (erro()) {
+  <app-ui-message class="mb-5" severity="error">{{ erro() }}</app-ui-message>
+}
+<form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+  <div class="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
+    <div class="grid min-w-0 gap-5">
+      <app-ui-card padding="lg">
+        <header class="mb-6 flex items-start gap-3">
+          <span
+            class="grid size-10 place-items-center rounded-xl bg-blue-50 font-bold text-blue-600"
+            >01</span
+          >
+          <div>
+            <h2 class="font-bold text-slate-950 dark:text-white">Dados do cliente</h2>
+            <p class="mt-1 text-sm text-slate-500">Identificação e contato vinculados ao pedido.</p>
+          </div>
+        </header>
+        <div class="grid gap-5 md:grid-cols-2">
+          <label
+            ><span class="mb-2 block text-sm font-semibold">Nome completo *</span
+            ><app-ui-input
+              inputClass="w-full"
+              formControlName="nomeCliente"
+              placeholder="Ex.: Maria da Silva"
+              [maxlength]="60"
+              [invalid]="form.controls.nomeCliente.touched && form.controls.nomeCliente.invalid"
+            />
+            @if (form.controls.nomeCliente.touched && form.controls.nomeCliente.invalid) {
+              <small class="mt-1.5 block text-xs text-red-500"
+                >Informe um nome com até 60 caracteres.</small
+              >
+            }
+          </label>
+          <label
+            ><span class="mb-2 block text-sm font-semibold">E-mail *</span
+            ><app-ui-input
+              inputClass="w-full"
+              type="email"
+              formControlName="emailCliente"
+              placeholder="cliente@email.com"
+              [maxlength]="60"
+              [invalid]="form.controls.emailCliente.touched && form.controls.emailCliente.invalid"
+            />
+            @if (form.controls.emailCliente.touched && form.controls.emailCliente.invalid) {
+              <small class="mt-1.5 block text-xs text-red-500">Informe um e-mail válido.</small>
+            }
+          </label>
+        </div>
+      </app-ui-card>
+      <app-ui-card padding="lg">
+        <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="flex gap-3">
+            <span
+              class="grid size-10 place-items-center rounded-xl bg-blue-50 font-bold text-blue-600"
+              >02</span
+            >
+            <div>
+              <h2 class="font-bold text-slate-950 dark:text-white">Itens do pedido</h2>
+              <p class="mt-1 text-sm text-slate-500">Adicione produtos e quantidades.</p>
+            </div>
+          </div>
+          <app-ui-button
+            label="Adicionar produto"
+            icon="pi pi-plus"
+            severity="secondary"
+            [outlined]="true"
+            [disabled]="!podeAdicionarItem()"
+            [tooltip]="podeAdicionarItem() ? undefined : 'Todos os produtos já foram adicionados.'"
+            (clicked)="adicionarItem()"
+          />
+        </header>
+        <div
+          class="hidden grid-cols-[minmax(0,1fr)_110px_150px_130px_40px] gap-3 border-b border-slate-200 px-3 pb-3 text-xs font-bold uppercase text-slate-500 xl:grid"
+        >
+          <span>Produto</span><span>Valor unitário</span><span>Quantidade</span
+          ><span class="text-right">Subtotal</span><span></span>
+        </div>
+        <div formArrayName="itensPedido" class="mt-3 grid gap-3">
+          @for (item of itens.controls; track item; let index = $index) {
+            <app-pedido-item-form
+              [group]="item"
+              [produtos]="produtosDisponiveis(index)"
+              [index]="index"
+              (remove)="removerItem(index)"
+            />
+          }
+        </div>
+      </app-ui-card>
+    </div>
+    <app-ui-card cardClass="xl:sticky xl:top-28">
+      <span class="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">Resumo</span>
+      <h2 class="mt-2 text-xl font-bold text-slate-950 dark:text-white">
+        {{ pedido ? 'Pedido #' + pedido.id : 'Novo pedido' }}
+      </h2>
+      <dl class="mt-5 divide-y divide-slate-200 text-sm">
+        <div class="flex justify-between py-3">
+          <dt>Produtos</dt>
+          <dd class="font-bold">{{ itens.length }}</dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt>Unidades</dt>
+          <dd class="font-bold">{{ totalUnidades() }}</dd>
+        </div>
+      </dl>
+      <div
+        class="my-5 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-500 p-5 text-white shadow-lg"
+      >
+        <span class="text-xs font-semibold uppercase">Total estimado</span
+        ><strong class="mt-2 block text-3xl">{{
+          totalEstimado() | currency: 'BRL' : 'symbol' : '1.2-2'
+        }}</strong>
+      </div>
+      <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4"
+        ><app-ui-toggle-switch formControlName="pago" ariaLabel="Pedido pago" /><span
+          ><strong class="block text-sm">Pedido pago</strong
+          ><small class="text-xs text-slate-500">Marque se o pagamento foi confirmado.</small></span
+        ></label
+      >
+      <div class="mt-5 grid gap-2">
+        <app-ui-button
+          [label]="pedido ? 'Salvar alterações' : 'Criar pedido'"
+          icon="pi pi-check"
+          type="submit"
+          [fluid]="true"
+          [loading]="salvando"
+          [disabled]="salvando"
+        />
+        <app-ui-button
+          label="Cancelar"
+          severity="secondary"
+          [outlined]="true"
+          [fluid]="true"
+          (clicked)="cancelled.emit()"
+        />
+      </div>
+    </app-ui-card>
+  </div>
+</form>
