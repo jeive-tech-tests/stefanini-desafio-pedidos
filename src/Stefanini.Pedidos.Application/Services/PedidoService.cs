@@ -53,6 +53,7 @@ public sealed class PedidoService(
             query.Pagina,
             query.TamanhoPagina,
             query.NomeCliente?.Trim(),
+            query.IdProduto,
             query.Pago,
             cancellationToken);
 
@@ -70,6 +71,12 @@ public sealed class PedidoService(
             query.TamanhoPagina,
             total,
             totalPaginas);
+    }
+
+    public Task<SumarioPedidosResponse> ObterSumarioAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return pedidoRepository.ObterSumarioAsync(cancellationToken);
     }
 
     public async Task<PedidoResponse> AtualizarAsync(

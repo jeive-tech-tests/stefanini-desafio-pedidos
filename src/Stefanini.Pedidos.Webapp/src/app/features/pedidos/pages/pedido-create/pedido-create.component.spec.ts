@@ -2,14 +2,13 @@ import { Signal } from '@angular/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
 import { of } from 'rxjs';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { UiConfirmationService } from '../../../../shared/components/ui-confirm-dialog/ui-confirm-dialog.component';
 import { CreatePedido } from '../../models/create-pedido.model';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
 import { PedidoService } from '../../services/pedido.service';
+import { PedidoListRefreshService } from '../../services/pedido-list-refresh.service';
 import { ProdutoService } from '../../services/produto.service';
 import { PedidoCreateComponent } from './pedido-create.component';
 
@@ -50,27 +49,24 @@ describe('PedidoCreateComponent', () => {
   };
   const criar = vi.fn();
   const notificar = vi.fn();
+  const requestRefresh = vi.fn();
 
   beforeEach(async () => {
     criar.mockReset().mockReturnValue(of(criado));
     notificar.mockReset();
+    requestRefresh.mockReset();
     await TestBed.configureTestingModule({
       imports: [PedidoCreateComponent],
       providers: [
         provideRouter([]),
         provideNoopAnimations(),
-        ConfirmationService,
         {
           provide: PedidoService,
-          useValue: {
-            criar,
-            listar: () =>
-              of({ itens: [], pagina: 1, tamanhoPagina: 8, totalItens: 0, totalPaginas: 0 }),
-          },
+          useValue: { criar },
         },
+        { provide: PedidoListRefreshService, useValue: { requestRefresh } },
         { provide: ProdutoService, useValue: { listar: () => of([produto]) } },
         { provide: NotificationService, useValue: { success: notificar } },
-        { provide: UiConfirmationService, useValue: { confirm: vi.fn() } },
       ],
     }).compileComponents();
   });
@@ -96,6 +92,7 @@ describe('PedidoCreateComponent', () => {
     expect(criar).toHaveBeenCalledWith(payload);
     expect(component.salvando()).toBe(false);
     expect(notificar).toHaveBeenCalledWith('Pedido criado', 'Pedido #42 criado com sucesso.');
+    expect(requestRefresh).toHaveBeenCalledTimes(1);
     expect(navegar).toHaveBeenCalledWith(['/pedidos', 42]);
   });
 
@@ -108,5 +105,6 @@ describe('PedidoCreateComponent', () => {
     (fixture.componentInstance as unknown as PedidoCreateHarness).cancelar();
 
     expect(navegar).toHaveBeenCalledWith(['/pedidos']);
+    expect(requestRefresh).not.toHaveBeenCalled();
   });
 });

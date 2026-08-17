@@ -34,6 +34,7 @@ export class UiInputNumberComponent implements ControlValueAccessor {
   @Input() invalid = false;
   @Input() ariaLabel?: string;
   @Input() inputClass = '';
+  @Input() inputFieldClass = '';
 
   protected value: number | null = null;
   protected disabled = false;

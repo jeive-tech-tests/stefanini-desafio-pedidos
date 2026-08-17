@@ -9,7 +9,9 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { UiConfirmationService } from '../../../../shared/components/ui-confirm-dialog/ui-confirm-dialog.component';
 import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
+import { SumarioPedidos } from '../../models/sumario-pedidos.model';
 import { PedidoService } from '../../services/pedido.service';
+import { PedidoListRefreshService } from '../../services/pedido-list-refresh.service';
 import { ProdutoService } from '../../services/produto.service';
 import { PedidoListComponent } from './pedido-list.component';
 
@@ -18,9 +20,7 @@ interface PedidoListHarness {
   pagina: Signal<number>;
   tamanhoPagina: Signal<number>;
   totalItens: Signal<number>;
-  valorTotalPagina: Signal<number>;
-  pagosPagina: Signal<number>;
-  pendentesPagina: Signal<number>;
+  sumario: Signal<SumarioPedidos>;
   erro: Signal<string | null>;
   filtros: FormGroup;
   alterarPagina(evento: { page?: number; rows?: number }): void;
@@ -56,6 +56,7 @@ const pedido: Pedido = {
 
 describe('PedidoListComponent', () => {
   const listarPedidos = vi.fn();
+  const obterSumario = vi.fn();
   const removerPedido = vi.fn();
   const listarProdutos = vi.fn();
   const notificarSucesso = vi.fn();
@@ -70,6 +71,11 @@ describe('PedidoListComponent', () => {
         of({ itens: [pedido], pagina: 1, tamanhoPagina: 8, totalItens: 1, totalPaginas: 1 }),
       );
     removerPedido.mockReset().mockReturnValue(of(undefined));
+    obterSumario
+      .mockReset()
+      .mockReturnValue(
+        of({ totalPedidos: 50, valorTotal: 123456.78, pedidosPagos: 32, pedidosPendentes: 18 }),
+      );
     listarProdutos.mockReset().mockReturnValue(of([produto]));
     notificarSucesso.mockReset();
     confirmar.mockReset();
@@ -80,7 +86,10 @@ describe('PedidoListComponent', () => {
         provideRouter([]),
         provideNoopAnimations(),
         ConfirmationService,
-        { provide: PedidoService, useValue: { listar: listarPedidos, remover: removerPedido } },
+        {
+          provide: PedidoService,
+          useValue: { listar: listarPedidos, obterSumario, remover: removerPedido },
+        },
         { provide: ProdutoService, useValue: { listar: listarProdutos } },
         { provide: NotificationService, useValue: { success: notificarSucesso } },
         { provide: UiConfirmationService, useValue: { confirm: confirmar } },
@@ -88,19 +97,23 @@ describe('PedidoListComponent', () => {
     }).compileComponents();
   });
 
-  it('carrega pedidos, produtos e indicadores da página', () => {
+  it('carrega a tabela e o sumário global em requisições independentes', () => {
     const fixture = TestBed.createComponent(PedidoListComponent);
     fixture.detectChanges();
     const component = fixture.componentInstance as unknown as PedidoListHarness;
 
     expect(component.pedidos()).toEqual([pedido]);
     expect(component.totalItens()).toBe(1);
-    expect(component.valorTotalPagina()).toBe(200);
-    expect(component.pagosPagina()).toBe(1);
-    expect(component.pendentesPagina()).toBe(0);
+    expect(component.sumario()).toEqual({
+      totalPedidos: 50,
+      valorTotal: 123456.78,
+      pedidosPagos: 32,
+      pedidosPendentes: 18,
+    });
     expect(component.totalUnidades(pedido)).toBe(2);
-    expect(component.percentual(1)).toBe(100);
+    expect(component.percentual(32)).toBe(64);
     expect(component.imagemProduto(1)).toBe('/api/produtos/1/imagem');
+    expect(obterSumario).toHaveBeenCalledTimes(1);
   });
 
   it('recarrega ao alterar página ou tamanho', () => {
@@ -113,6 +126,18 @@ describe('PedidoListComponent', () => {
     expect(component.pagina()).toBe(2);
     expect(component.tamanhoPagina()).toBe(20);
     expect(listarPedidos).toHaveBeenLastCalledWith({ pagina: 2, tamanhoPagina: 20 });
+    expect(obterSumario).toHaveBeenCalledTimes(1);
+  });
+
+  it('recarrega tabela e sumário somente quando uma alteração é solicitada', () => {
+    const fixture = TestBed.createComponent(PedidoListComponent);
+    const listRefresh = TestBed.inject(PedidoListRefreshService);
+    fixture.detectChanges();
+
+    listRefresh.requestRefresh();
+
+    expect(listarPedidos).toHaveBeenCalledTimes(2);
+    expect(obterSumario).toHaveBeenCalledTimes(2);
   });
 
   it('aguarda o fim da digitação antes de pesquisar pelo cliente', async () => {
@@ -135,6 +160,24 @@ describe('PedidoListComponent', () => {
       tamanhoPagina: 8,
       nomeCliente: 'cliente',
     });
+    expect(obterSumario).toHaveBeenCalledTimes(1);
+  });
+
+  it('filtra pedidos pelo produto selecionado sem atualizar o sumário', async () => {
+    vi.useFakeTimers();
+    const fixture = TestBed.createComponent(PedidoListComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance as unknown as PedidoListHarness;
+
+    component.filtros.get('idProduto')!.setValue(1);
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(listarPedidos).toHaveBeenLastCalledWith({
+      pagina: 1,
+      tamanhoPagina: 8,
+      idProduto: 1,
+    });
+    expect(obterSumario).toHaveBeenCalledTimes(1);
   });
 
   it('cancela uma listagem anterior ao iniciar uma nova consulta', () => {
@@ -156,6 +199,7 @@ describe('PedidoListComponent', () => {
 
     expect(consultaAnteriorCancelada).toBe(true);
     expect(listarPedidos).toHaveBeenCalledTimes(2);
+    expect(obterSumario).toHaveBeenCalledTimes(1);
   });
 
   it('confirma, remove e recarrega um pedido', () => {
@@ -173,6 +217,20 @@ describe('PedidoListComponent', () => {
       'Pedido #42 removido com sucesso.',
     );
     expect(listarPedidos).toHaveBeenCalledTimes(2);
+    expect(obterSumario).toHaveBeenCalledTimes(2);
+  });
+
+  it('mantém a tabela disponível e informa quando o sumário falha', () => {
+    obterSumario.mockReturnValue(
+      throwError(() => ({ status: 500, error: { detail: 'Falha no sumário.' } })),
+    );
+    const fixture = TestBed.createComponent(PedidoListComponent);
+
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance as unknown as PedidoListHarness;
+    expect(component.pedidos()).toEqual([pedido]);
+    expect(component.sumario().totalPedidos).toBe(0);
   });
 
   it('exibe a mensagem retornada pela API quando a listagem falha', () => {

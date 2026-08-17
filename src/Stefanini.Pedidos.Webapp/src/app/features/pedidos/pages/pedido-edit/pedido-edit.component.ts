@@ -17,17 +17,18 @@ import { Pedido } from '../../models/pedido.model';
 import { Produto } from '../../models/produto.model';
 import { UpdatePedido } from '../../models/update-pedido.model';
 import { PedidoService } from '../../services/pedido.service';
+import { PedidoListRefreshService } from '../../services/pedido-list-refresh.service';
 import { ProdutoService } from '../../services/produto.service';
-import { PedidoListComponent } from '../pedido-list/pedido-list.component';
 
 @Component({
   selector: 'app-pedido-edit',
-  imports: [PedidoFormComponent, PedidoListComponent, UiLoadingComponent, UiModalComponent],
+  imports: [PedidoFormComponent, UiLoadingComponent, UiModalComponent],
   templateUrl: './pedido-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PedidoEditComponent implements OnInit {
   private readonly service = inject(PedidoService);
+  private readonly listRefresh = inject(PedidoListRefreshService);
   private readonly products = inject(ProdutoService);
   private readonly notifications = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
@@ -66,6 +67,7 @@ export class PedidoEditComponent implements OnInit {
             'Pedido atualizado',
             `Pedido #${pedido.id} atualizado com sucesso.`,
           );
+          this.listRefresh.requestRefresh();
           void this.router.navigate(['/pedidos']);
         },
         error: () => undefined,

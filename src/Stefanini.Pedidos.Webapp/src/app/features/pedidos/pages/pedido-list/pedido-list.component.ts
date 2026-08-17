@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import {
   EMPTY,
   Subject,
@@ -44,8 +44,10 @@ import { UiTagComponent } from '../../../../shared/components/ui-tag/ui-tag.comp
 import { Pedido } from '../../models/pedido.model';
 import { PedidosQuery } from '../../models/pedidos-query.model';
 import { PedidoService } from '../../services/pedido.service';
+import { PedidoListRefreshService } from '../../services/pedido-list-refresh.service';
 import { ProdutoService } from '../../services/produto.service';
 import { Produto } from '../../models/produto.model';
+import { SumarioPedidos } from '../../models/sumario-pedidos.model';
 
 type StatusFiltro = 'todos' | 'pago' | 'pendente';
 const TEMPO_ESPERA_FILTRO_MS = 500;
@@ -56,6 +58,7 @@ const TEMPO_ESPERA_FILTRO_MS = 500;
     CurrencyPipe,
     ReactiveFormsModule,
     RouterLink,
+    RouterOutlet,
     UiEmptyStateComponent,
     UiLoadingComponent,
     UiButtonComponent,
@@ -72,6 +75,7 @@ const TEMPO_ESPERA_FILTRO_MS = 500;
 })
 export class PedidoListComponent implements OnInit {
   private readonly pedidosService = inject(PedidoService);
+  private readonly listRefresh = inject(PedidoListRefreshService);
   private readonly produtosService = inject(ProdutoService);
   private readonly notifications = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
@@ -87,15 +91,15 @@ export class PedidoListComponent implements OnInit {
   protected readonly tamanhoPagina = signal(8);
   protected readonly totalItens = signal(0);
   protected readonly totalPaginas = signal(0);
-  protected readonly valorTotalPagina = computed(() =>
-    this.pedidos().reduce((total, pedido) => total + pedido.valorTotal, 0),
-  );
-  protected readonly pagosPagina = computed(
-    () => this.pedidos().filter((pedido) => pedido.pago).length,
-  );
-  protected readonly pendentesPagina = computed(
-    () => this.pedidos().filter((pedido) => !pedido.pago).length,
-  );
+  protected readonly sumario = signal<SumarioPedidos>({
+    totalPedidos: 0,
+    valorTotal: 0,
+    pedidosPagos: 0,
+    pedidosPendentes: 0,
+  });
+  protected readonly carregandoSumario = signal(true);
+  protected readonly erroSumario = signal<string | null>(null);
+  protected readonly mensagemErro = computed(() => this.erro() ?? this.erroSumario());
 
   protected readonly statusOpcoes = [
     { label: 'Todos os status', value: 'todos' as const },
@@ -105,6 +109,7 @@ export class PedidoListComponent implements OnInit {
 
   protected readonly filtros = new FormGroup({
     nomeCliente: new FormControl('', { nonNullable: true }),
+    idProduto: new FormControl<number | null>(null),
     status: new FormControl<StatusFiltro>('todos', { nonNullable: true }),
   });
 
@@ -146,12 +151,15 @@ export class PedidoListComponent implements OnInit {
       .pipe(
         map((filtros) => ({
           nomeCliente: filtros.nomeCliente?.trim() ?? '',
+          idProduto: filtros.idProduto ?? null,
           status: filtros.status ?? 'todos',
         })),
         debounceTime(TEMPO_ESPERA_FILTRO_MS),
         distinctUntilChanged(
           (anterior, atual) =>
-            anterior.nomeCliente === atual.nomeCliente && anterior.status === atual.status,
+            anterior.nomeCliente === atual.nomeCliente &&
+            anterior.idProduto === atual.idProduto &&
+            anterior.status === atual.status,
         ),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -160,26 +168,37 @@ export class PedidoListComponent implements OnInit {
         this.carregar();
       });
 
-    this.carregar();
+    this.listRefresh.refreshRequested$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.carregarTudo());
+
+    this.carregarTudo();
   }
 
   protected carregar(): void {
     this.recarregarPedidos$.next();
   }
 
+  protected carregarTudo(): void {
+    this.carregarSumario();
+    this.carregar();
+  }
+
   private criarFiltro(): PedidosQuery {
     const status = this.filtros.controls.status.value;
     const nomeCliente = this.filtros.controls.nomeCliente.value.trim();
+    const idProduto = this.filtros.controls.idProduto.value;
     return {
       pagina: this.pagina(),
       tamanhoPagina: this.tamanhoPagina(),
       ...(nomeCliente ? { nomeCliente } : {}),
+      ...(idProduto !== null ? { idProduto } : {}),
       ...(status !== 'todos' ? { pago: status === 'pago' } : {}),
     };
   }
 
   protected limparFiltros(): void {
-    this.filtros.setValue({ nomeCliente: '', status: 'todos' });
+    this.filtros.setValue({ nomeCliente: '', idProduto: null, status: 'todos' });
   }
 
   protected alterarPagina(evento: UiPageChange): void {
@@ -213,7 +232,8 @@ export class PedidoListComponent implements OnInit {
   }
 
   protected percentual(quantidade: number): number {
-    return this.pedidos().length === 0 ? 0 : Math.round((quantidade / this.pedidos().length) * 100);
+    const totalPedidos = this.sumario().totalPedidos;
+    return totalPedidos === 0 ? 0 : Math.round((quantidade / totalPedidos) * 100);
   }
 
   protected imagemProduto(idProduto: number): string {
@@ -239,9 +259,25 @@ export class PedidoListComponent implements OnInit {
           if (this.pedidos().length === 1 && this.pagina() > 1) {
             this.pagina.update((pagina) => pagina - 1);
           }
-          this.carregar();
+          this.carregarTudo();
         },
         error: (error: unknown) => this.erro.set(mensagemErroHttp(error)),
+      });
+  }
+
+  private carregarSumario(): void {
+    this.carregandoSumario.set(true);
+    this.erroSumario.set(null);
+
+    this.pedidosService
+      .obterSumario()
+      .pipe(
+        finalize(() => this.carregandoSumario.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (sumario) => this.sumario.set(sumario),
+        error: (error: unknown) => this.erroSumario.set(mensagemErroHttp(error)),
       });
   }
 }

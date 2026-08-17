@@ -1,53 +1,56 @@
-<section class="mx-auto w-full max-w-[1200px] px-4 py-7 sm:px-6 sm:py-9 lg:px-10">
-  <a
-    class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500"
-    routerLink="/pedidos"
-    ><i class="pi pi-arrow-left"></i>Voltar para pedidos</a
-  >
-  <app-ui-page-header
-    eyebrow="Consulta"
-    [title]="'Pedido #' + id"
-    description="Dados completos do cliente, pagamento e itens do pedido."
-  />
+<app-ui-modal
+  [visible]="true"
+  [header]="'Detalhes do pedido #' + id"
+  width="min(1000px, 96vw)"
+  (closed)="fechar()"
+>
+  <p class="mb-6 text-sm text-slate-500 dark:text-blue-200/70">
+    Consulte os dados do cliente, o pagamento e os itens do pedido.
+  </p>
+
   @if (carregando()) {
     <app-ui-loading label="Carregando detalhes..." />
   } @else if (pedido(); as order) {
-    <div class="grid gap-5 lg:grid-cols-[1fr_320px]">
-      <app-ui-card padding="none" cardClass="overflow-hidden">
-        <div class="border-b border-slate-200 p-6 dark:border-slate-800">
+    <div class="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <app-ui-card padding="none" cardClass="min-w-0 overflow-hidden">
+        <div class="border-b border-slate-200 p-5 sm:p-6 dark:border-slate-800">
           <h2 class="font-bold text-slate-950 dark:text-white">Cliente</h2>
           <dl class="mt-4 grid gap-4 sm:grid-cols-2">
-            <div>
+            <div class="min-w-0">
               <dt class="text-xs font-semibold uppercase text-slate-500">Nome</dt>
-              <dd class="mt-1 font-semibold">{{ order.nomeCliente }}</dd>
+              <dd class="mt-1 truncate font-semibold" [title]="order.nomeCliente">
+                {{ order.nomeCliente }}
+              </dd>
             </div>
-            <div>
+            <div class="min-w-0">
               <dt class="text-xs font-semibold uppercase text-slate-500">E-mail</dt>
-              <dd class="mt-1">{{ order.emailCliente }}</dd>
+              <dd class="mt-1 break-all">{{ order.emailCliente }}</dd>
             </div>
           </dl>
         </div>
-        <div class="p-6">
+
+        <div class="p-5 sm:p-6">
           <h2 class="mb-4 font-bold text-slate-950 dark:text-white">Itens</h2>
           <div class="grid gap-3">
             @for (item of order.itensPedido; track item.id) {
               <article
-                class="grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-[auto_1fr_auto_auto] sm:items-center dark:border-blue-900/70"
+                class="grid min-w-0 gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center dark:border-blue-900/70"
               >
                 <app-ui-product-image
                   [src]="imagemProduto(item.idProduto)"
                   [alt]="item.nomeProduto"
                   size="lg"
                 />
-                <div>
-                  <strong>{{ item.nomeProduto }}</strong
-                  ><small class="mt-1 block text-slate-500"
-                    >{{ item.valorUnitario | currency: 'BRL' : 'symbol' : '1.2-2' }} por
-                    unidade</small
-                  >
+                <div class="min-w-0">
+                  <strong class="block truncate" [title]="item.nomeProduto">{{
+                    item.nomeProduto
+                  }}</strong>
+                  <small class="mt-1 block text-slate-500">
+                    {{ item.quantidade }} ×
+                    {{ item.valorUnitario | currency: 'BRL' : 'symbol' : '1.2-2' }}
+                  </small>
                 </div>
-                <span>{{ item.quantidade }} un.</span
-                ><strong>{{
+                <strong class="whitespace-nowrap text-slate-950 dark:text-white">{{
                   item.valorUnitario * item.quantidade | currency: 'BRL' : 'symbol' : '1.2-2'
                 }}</strong>
               </article>
@@ -55,23 +58,34 @@
           </div>
         </div>
       </app-ui-card>
+
       <app-ui-card cardClass="h-fit">
         <app-ui-tag
           [severity]="order.pago ? 'success' : 'warn'"
           [value]="order.pago ? 'Pago' : 'Pendente'"
+          [icon]="order.pago ? 'pi pi-check-circle' : 'pi pi-clock'"
           [rounded]="true"
-        /><span class="mt-6 block text-xs font-semibold uppercase text-slate-500">Valor total</span
-        ><strong class="mt-2 block text-3xl text-slate-950 dark:text-white">{{
-          order.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2'
-        }}</strong
-        ><app-ui-button
+        />
+        <span class="mt-6 block text-xs font-semibold uppercase text-slate-500">Valor total</span>
+        <strong class="mt-2 block whitespace-nowrap text-3xl text-slate-950 dark:text-white">
+          {{ order.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        </strong>
+        <app-ui-button
           label="Editar pedido"
           icon="pi pi-pencil"
           buttonClass="mt-6"
           [fluid]="true"
           [routerLink]="['/pedidos', order.id, 'editar']"
         />
+        <app-ui-button
+          label="Fechar"
+          severity="secondary"
+          buttonClass="mt-3"
+          [outlined]="true"
+          [fluid]="true"
+          (clicked)="fechar()"
+        />
       </app-ui-card>
     </div>
   }
-</section>
+</app-ui-modal>

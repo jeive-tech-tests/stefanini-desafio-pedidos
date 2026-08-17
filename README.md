@@ -4,13 +4,33 @@
 
 Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD completo de pedidos, com API REST em .NET, interface responsiva em Angular, persistência em SQL Server, testes automatizados e execução integrada com Docker.
 
+## Aderência ao desafio técnico
+
+| Requisito do PDF                      | Implementação                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Projeto compilando                    | Builds independentes de .NET e Angular, além de imagem Docker multi-stage                  |
+| DDD, SOLID, Clean Code e REST         | Camadas Domain, Application, Infrastructure e Api, com contratos e injeção de dependências |
+| Criar e consultar pedido              | `POST /api/pedidos`, `GET /api/pedidos/{id}` e listagem paginada                           |
+| Testes do GET em controller e serviço | Suítes unitárias específicas e testes de integração HTTP                                   |
+| Migration SQL                         | Migrations versionadas e aplicadas automaticamente no container                            |
+| Swagger                               | OpenAPI e Swagger UI disponíveis em `/swagger`                                             |
+| JSON exigido                          | Resposta contém pedido, cliente, pagamento, `valorTotal` e itens com preço praticado       |
+| Erros e validações                    | `ProblemDetails` para 400, 404, 409 e 500, com validação de entrada                        |
+| CRUD completo                         | Criação, consulta, atualização e exclusão                                                  |
+| Paginação e filtros                   | Filtros combináveis por nome/e-mail, produto e pagamento                                   |
+| Frontend integrado                    | Angular responsivo com PrimeNG, Tailwind CSS e design system `ui-*`                        |
+| Publicação em cloud                   | Aplicação e API em `https://jeive.dev/stefanini-desafio-pedidos/`                          |
+| Banco no Docker Compose               | SQL Server persistente, acompanhado de MinIO para imagens dos produtos                     |
+| Design Patterns                       | Repository, Unit of Work, Dependency Injection e componentes reutilizáveis                 |
+
 ## Visão geral
 
 - criação, consulta, edição e exclusão de pedidos;
 - cálculo do valor total no backend e no frontend;
 - preço unitário preservado no item no momento da compra;
-- filtros por cliente e situação do pagamento;
+- filtros por nome ou e-mail do cliente, produto e situação do pagamento;
 - paginação da listagem;
+- sumário global de pedidos independente de filtros e paginação;
 - respostas de erro padronizadas com `ProblemDetails`;
 - Swagger/OpenAPI;
 - migration e catálogo inicial de produtos;
@@ -20,16 +40,16 @@ Solução do **Desafio Full Stack .NET + Angular v4**. O projeto oferece um CRUD
 
 ## Tecnologias
 
-| Camada              | Tecnologia                                                |
-| ------------------- | --------------------------------------------------------- |
-| API                 | .NET 10, ASP.NET Core, Entity Framework Core              |
-| Arquitetura         | Clean Architecture, DDD tático, Repository e Unit of Work |
-| Banco de dados      | SQL Server 2022                                           |
-| Documentação da API | Swagger/OpenAPI                                           |
+| Camada              | Tecnologia                                                   |
+| ------------------- | ------------------------------------------------------------ |
+| API                 | .NET 10, ASP.NET Core, Entity Framework Core                 |
+| Arquitetura         | Clean Architecture, DDD tático, Repository e Unit of Work    |
+| Banco de dados      | SQL Server 2022                                              |
+| Documentação da API | Swagger/OpenAPI                                              |
 | Frontend            | Angular 21, PrimeNG 21, Tailwind CSS 4, TypeScript 5.9, RxJS |
-| Testes              | xUnit, NSubstitute e Vitest                               |
-| Objetos             | MinIO para imagens dos produtos                           |
-| Infraestrutura      | Docker e Docker Compose                                   |
+| Testes              | xUnit, NSubstitute e Vitest                                  |
+| Objetos             | MinIO para imagens dos produtos                              |
+| Infraestrutura      | Docker e Docker Compose                                      |
 
 ## Arquitetura
 
@@ -176,27 +196,29 @@ Acesse <http://localhost:4200>. O proxy de desenvolvimento encaminha `/api` para
 
 ## Endpoints
 
-| Método   | Rota                | Descrição                             |
-| -------- | ------------------- | ------------------------------------- |
-| `POST`   | `/api/pedidos`      | cria um pedido                        |
-| `GET`    | `/api/pedidos/{id}` | consulta um pedido por id             |
-| `GET`    | `/api/pedidos`      | lista pedidos com filtros e paginação |
-| `PUT`    | `/api/pedidos/{id}` | atualiza um pedido                    |
-| `DELETE` | `/api/pedidos/{id}` | exclui um pedido                      |
-| `GET`    | `/api/produtos`     | lista o catálogo de produtos          |
-| `GET`    | `/api/produtos/{id}/imagem` | entrega a imagem do produto armazenada no MinIO |
+| Método   | Rota                        | Descrição                                               |
+| -------- | --------------------------- | ------------------------------------------------------- |
+| `POST`   | `/api/pedidos`              | cria um pedido                                          |
+| `GET`    | `/api/pedidos/{id}`         | consulta um pedido por id                               |
+| `GET`    | `/api/pedidos`              | lista pedidos com filtros e paginação                   |
+| `GET`    | `/api/pedidos/sumario`      | agrega totais, valores e pagamentos de todos os pedidos |
+| `PUT`    | `/api/pedidos/{id}`         | atualiza um pedido                                      |
+| `DELETE` | `/api/pedidos/{id}`         | exclui um pedido                                        |
+| `GET`    | `/api/produtos`             | lista o catálogo de produtos                            |
+| `GET`    | `/api/produtos/{id}/imagem` | entrega a imagem do produto armazenada no MinIO         |
 
 Parâmetros opcionais da listagem:
 
 - `pagina` — número da página, começando em 1;
 - `tamanhoPagina` — quantidade de registros, entre 1 e 100;
-- `nomeCliente` — trecho do nome do cliente;
+- `nomeCliente` — trecho do nome ou do e-mail do cliente;
+- `idProduto` — identificador do produto presente nos itens do pedido;
 - `pago` — `true` ou `false`.
 
 Exemplo:
 
 ```http
-GET /api/pedidos?pagina=1&tamanhoPagina=10&nomeCliente=maria&pago=false
+GET /api/pedidos?pagina=1&tamanhoPagina=10&nomeCliente=maria&idProduto=1&pago=false
 ```
 
 ### Criar pedido

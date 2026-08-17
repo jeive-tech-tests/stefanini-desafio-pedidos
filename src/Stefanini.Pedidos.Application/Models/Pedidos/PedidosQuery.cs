@@ -13,5 +13,8 @@ public sealed class PedidosQuery
     [MaxLength(60, ErrorMessage = "O filtro de cliente deve ter no máximo 60 caracteres.")]
     public string? NomeCliente { get; init; }
 
+    [Range(1, int.MaxValue, ErrorMessage = "O produto informado é inválido.")]
+    public int? IdProduto { get; init; }
+
     public bool? Pago { get; init; }
 }

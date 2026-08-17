@@ -150,11 +150,12 @@ public sealed class PedidoServiceTests
             Pagina = 2,
             TamanhoPagina = 2,
             NomeCliente = "  Cliente  ",
+            IdProduto = 7,
             Pago = false
         };
         Pedido pedido = PedidoBuilder.CriarPedido();
         _pedidoRepository
-            .ListarAsync(2, 2, "Cliente", false, Arg.Any<CancellationToken>())
+            .ListarAsync(2, 2, "Cliente", 7, false, Arg.Any<CancellationToken>())
             .Returns(([pedido], 5));
         PedidoService service = CriarService();
 
@@ -165,6 +166,30 @@ public sealed class PedidoServiceTests
         Assert.Equal(5, resultado.TotalItens);
         Assert.Equal(3, resultado.TotalPaginas);
         Assert.Equal(42, Assert.Single(resultado.Itens).Id);
+    }
+
+    [Fact]
+    public async Task ObterSumario_DeveRetornarAgregadosGlobaisDoRepositorio()
+    {
+        var esperado = new SumarioPedidosResponse(50, 123_456.78m, 32, 18);
+        _pedidoRepository
+            .ObterSumarioAsync(Arg.Any<CancellationToken>())
+            .Returns(esperado);
+        PedidoService service = CriarService();
+
+        SumarioPedidosResponse resultado = await service.ObterSumarioAsync(
+            CancellationToken.None);
+
+        Assert.Same(esperado, resultado);
+        await _pedidoRepository.Received(1).ObterSumarioAsync(
+            Arg.Any<CancellationToken>());
+        await _pedidoRepository.DidNotReceive().ListarAsync(
+            Arg.Any<int>(),
+            Arg.Any<int>(),
+            Arg.Any<string?>(),
+            Arg.Any<int?>(),
+            Arg.Any<bool?>(),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

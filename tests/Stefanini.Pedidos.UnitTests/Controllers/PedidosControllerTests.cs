@@ -84,6 +84,23 @@ public sealed class PedidosControllerTests
     }
 
     [Fact]
+    public async Task ObterSumario_DeveRetornarOkComAgregadosGlobais()
+    {
+        var resposta = new SumarioPedidosResponse(50, 123_456.78m, 32, 18);
+        _pedidoService
+            .ObterSumarioAsync(Arg.Any<CancellationToken>())
+            .Returns(resposta);
+        var controller = new PedidosController(_pedidoService);
+
+        ActionResult<SumarioPedidosResponse> resultado = await controller.ObterSumario(
+            CancellationToken.None);
+
+        OkObjectResult ok = Assert.IsType<OkObjectResult>(resultado.Result);
+        Assert.Same(resposta, ok.Value);
+        await _pedidoService.Received(1).ObterSumarioAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task Atualizar_QuandoPedidoExiste_DeveRetornarOk()
     {
         var request = new AtualizarPedidoRequest
