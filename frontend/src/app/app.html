@@ -1,31 +1,115 @@
-<div class="app-shell">
-  <header class="topbar">
-    <a class="brand" routerLink="/pedidos" aria-label="Ir para pedidos">
-      <span class="brand-mark" aria-hidden="true">SP</span>
-      <span>
-        <strong>Stefanini</strong>
-        <small>Gestão de pedidos</small>
-      </span>
-    </a>
-
-    <nav aria-label="Navegação principal">
+<div
+  class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-700 antialiased transition-colors dark:bg-slate-950 dark:text-slate-200"
+>
+  <header
+    class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95"
+  >
+    <div class="mx-auto flex h-20 max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-10">
       <a
+        class="flex shrink-0 items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         routerLink="/pedidos"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
+        aria-label="Ir para pedidos"
       >
-        Pedidos
+        <span
+          class="grid size-11 place-items-center rounded-xl bg-blue-600 text-xl text-white shadow-lg shadow-blue-600/20"
+          aria-hidden="true"
+        >
+          <i class="pi pi-shopping-cart"></i>
+        </span>
+        <span class="hidden sm:block">
+          <strong class="block text-base font-bold tracking-tight text-slate-950 dark:text-white"
+            >Pedidos</strong
+          >
+          <small class="mt-0.5 block text-[11px] font-medium text-slate-500 dark:text-slate-400"
+            >CRUD · .NET & Angular</small
+          >
+        </span>
       </a>
-      <a class="nav-cta" routerLink="/pedidos/novo">Novo pedido</a>
-    </nav>
+
+      <nav class="ml-1 flex h-full items-stretch gap-1 sm:ml-8" aria-label="Navegação principal">
+        <a
+          class="relative flex items-center gap-2 px-3 text-sm font-semibold text-slate-600 transition hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 sm:px-5"
+          routerLink="/pedidos"
+          routerLinkActive="text-blue-600 dark:text-blue-400 after:absolute after:inset-x-2 after:bottom-0 after:h-1 after:rounded-t-full after:bg-blue-600"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <i class="pi pi-list text-base" aria-hidden="true"></i>
+          <span class="hidden sm:inline">Pedidos</span>
+        </a>
+        <a
+          class="relative flex items-center gap-2 px-3 text-sm font-semibold text-slate-600 transition hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 sm:px-5"
+          routerLink="/pedidos/novo"
+          routerLinkActive="text-blue-600 dark:text-blue-400 after:absolute after:inset-x-2 after:bottom-0 after:h-1 after:rounded-t-full after:bg-blue-600"
+        >
+          <i class="pi pi-plus-circle text-base" aria-hidden="true"></i>
+          <span class="hidden sm:inline">Novo pedido</span>
+        </a>
+      </nav>
+
+      <div class="ml-auto flex items-center gap-1 sm:gap-2">
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          [attr.aria-label]="temaEscuro() ? 'Ativar tema claro' : 'Ativar tema escuro'"
+          [pTooltip]="temaEscuro() ? 'Tema claro' : 'Tema escuro'"
+          tooltipPosition="bottom"
+          (click)="alternarTema()"
+        >
+          <i [class]="temaEscuro() ? 'pi pi-sun' : 'pi pi-moon'" aria-hidden="true"></i>
+        </button>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          icon="pi pi-question-circle"
+          aria-label="Ajuda"
+          pTooltip="API documentada no Swagger"
+          tooltipPosition="bottom"
+        ></button>
+        <a
+          pButton
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          icon="pi pi-external-link"
+          href="swagger"
+          target="_blank"
+          aria-label="Abrir Swagger"
+          pTooltip="Abrir Swagger"
+          tooltipPosition="bottom"
+        ></a>
+      </div>
+    </div>
   </header>
 
-  <main>
+  <main class="flex-1">
     <router-outlet />
   </main>
 
-  <footer>
-    <span>Desafio Full Stack .NET + Angular</span>
-    <span>API REST • Clean Architecture • SQL Server</span>
+  <footer class="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <div
+      class="mx-auto flex max-w-[1540px] flex-col gap-4 px-4 py-5 text-xs text-slate-500 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-10 dark:text-slate-400"
+    >
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 font-semibold">
+        <span class="flex items-center gap-2"
+          ><i class="pi pi-microsoft text-blue-600"></i>.NET 10</span
+        >
+        <span class="flex items-center gap-2"
+          ><i class="pi pi-code text-red-500"></i>Angular 21</span
+        >
+        <span class="flex items-center gap-2"
+          ><i class="pi pi-database text-blue-700"></i>SQL Server</span
+        >
+      </div>
+      <span class="text-center">API REST · Clean Architecture · DDD · SOLID</span>
+      <span class="font-semibold text-slate-600 dark:text-slate-300"
+        >Desafio Full Stack .NET + Angular <i class="pi pi-heart ml-1 text-blue-600"></i
+      ></span>
+    </div>
   </footer>
 </div>
