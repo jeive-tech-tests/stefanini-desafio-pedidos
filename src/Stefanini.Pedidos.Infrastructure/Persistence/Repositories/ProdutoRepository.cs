@@ -20,7 +20,6 @@ public sealed class ProdutoRepository(PedidosDbContext context) : IProdutoReposi
         CancellationToken cancellationToken = default)
     {
         return await context.Produtos
-            .AsNoTracking()
             .Where(produto => ids.Contains(produto.Id))
             .ToListAsync(cancellationToken);
     }

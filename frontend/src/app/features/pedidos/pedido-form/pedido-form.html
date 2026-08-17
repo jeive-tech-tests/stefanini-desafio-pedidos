@@ -1,0 +1,191 @@
+<section class="page-container form-page">
+  <a class="back-link" routerLink="/pedidos">← Voltar para pedidos</a>
+
+  <header class="page-heading">
+    <p class="eyebrow">{{ editando ? 'Atualização' : 'Novo registro' }}</p>
+    <h1>{{ editando ? 'Editar pedido #' + pedidoId : 'Criar pedido' }}</h1>
+    <p>
+      Informe os dados do cliente e selecione os produtos. O preço atual será preservado no pedido.
+    </p>
+  </header>
+
+  @if (erro()) {
+    <div class="alert alert-error" role="alert">{{ erro() }}</div>
+  }
+
+  @if (carregando()) {
+    <div class="form-loading" role="status">
+      <span aria-hidden="true"></span>
+      Carregando formulário...
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+      <div class="form-layout">
+        <div class="form-main">
+          <section class="form-card">
+            <header>
+              <span class="step">01</span>
+              <div>
+                <h2>Dados do cliente</h2>
+                <p>Identificação e contato vinculados ao pedido.</p>
+              </div>
+            </header>
+
+            <div class="fields-grid">
+              <label>
+                <span>Nome completo <em>*</em></span>
+                <input
+                  type="text"
+                  formControlName="nomeCliente"
+                  placeholder="Ex.: Maria da Silva"
+                  autocomplete="name"
+                  maxlength="60"
+                />
+                @if (form.controls.nomeCliente.touched && form.controls.nomeCliente.invalid) {
+                  <small>Informe um nome com até 60 caracteres.</small>
+                }
+              </label>
+
+              <label>
+                <span>E-mail <em>*</em></span>
+                <input
+                  type="email"
+                  formControlName="emailCliente"
+                  placeholder="cliente@email.com"
+                  autocomplete="email"
+                  maxlength="60"
+                />
+                @if (form.controls.emailCliente.touched && form.controls.emailCliente.invalid) {
+                  <small>Informe um e-mail válido com até 60 caracteres.</small>
+                }
+              </label>
+            </div>
+          </section>
+
+          <section class="form-card items-card">
+            <header>
+              <span class="step">02</span>
+              <div>
+                <h2>Itens do pedido</h2>
+                <p>Adicione produtos e defina as quantidades desejadas.</p>
+              </div>
+            </header>
+
+            <div class="items-header" aria-hidden="true">
+              <span>Produto</span>
+              <span>Valor unitário</span>
+              <span>Quantidade</span>
+              <span>Subtotal</span>
+              <span></span>
+            </div>
+
+            <div formArrayName="itensPedido" class="items-list">
+              @for (itemForm of itens.controls; track $index; let index = $index) {
+                <div class="item-row" [formGroupName]="index">
+                  <label>
+                    <span class="mobile-label">Produto</span>
+                    <select
+                      formControlName="idProduto"
+                      [attr.aria-label]="'Produto do item ' + (index + 1)"
+                    >
+                      <option [ngValue]="null" disabled>Selecione um produto</option>
+                      @for (produto of produtos(); track produto.id) {
+                        <option [ngValue]="produto.id">{{ produto.nomeProduto }}</option>
+                      }
+                    </select>
+                    @if (
+                      itemForm.controls.idProduto.touched && itemForm.controls.idProduto.invalid
+                    ) {
+                      <small>Selecione um produto.</small>
+                    }
+                  </label>
+
+                  <div class="money-cell">
+                    <span class="mobile-label">Valor unitário</span>
+                    {{
+                      valorProduto(itemForm.controls.idProduto.value)
+                        | currency: 'BRL' : 'symbol' : '1.2-2'
+                    }}
+                  </div>
+
+                  <label>
+                    <span class="mobile-label">Quantidade</span>
+                    <input
+                      type="number"
+                      formControlName="quantidade"
+                      min="1"
+                      [attr.aria-label]="'Quantidade do item ' + (index + 1)"
+                    />
+                    @if (
+                      itemForm.controls.quantidade.touched && itemForm.controls.quantidade.invalid
+                    ) {
+                      <small>Quantidade mínima: 1.</small>
+                    }
+                  </label>
+
+                  <div class="subtotal">
+                    <span class="mobile-label">Subtotal</span>
+                    {{ subtotalItem(index) | currency: 'BRL' : 'symbol' : '1.2-2' }}
+                  </div>
+
+                  <button
+                    class="remove-item"
+                    type="button"
+                    (click)="removerItem(index)"
+                    [attr.aria-label]="'Remover item ' + (index + 1)"
+                    title="Remover item"
+                  >
+                    ×
+                  </button>
+                </div>
+              }
+            </div>
+
+            <button class="add-item" type="button" (click)="adicionarItem()">
+              <span aria-hidden="true">＋</span>
+              Adicionar produto
+            </button>
+          </section>
+        </div>
+
+        <aside class="summary-card">
+          <p class="summary-eyebrow">Resumo</p>
+          <h2>{{ editando ? 'Pedido #' + pedidoId : 'Novo pedido' }}</h2>
+
+          <dl>
+            <div>
+              <dt>Produtos</dt>
+              <dd>{{ itens.length }}</dd>
+            </div>
+            <div>
+              <dt>Unidades</dt>
+              <dd>{{ totalUnidades() }}</dd>
+            </div>
+          </dl>
+
+          <div class="total-box">
+            <span>Total estimado</span>
+            <strong>{{ totalEstimado() | currency: 'BRL' : 'symbol' : '1.2-2' }}</strong>
+            <small>Calculado com os preços atuais</small>
+          </div>
+
+          <label class="payment-toggle">
+            <input type="checkbox" formControlName="pago" />
+            <span class="toggle" aria-hidden="true"></span>
+            <span>
+              <strong>Pedido pago</strong>
+              <small>Marque se o pagamento já foi confirmado.</small>
+            </span>
+          </label>
+
+          <div class="summary-actions">
+            <button class="button button-primary" type="submit" [disabled]="salvando()">
+              {{ salvando() ? 'Salvando…' : editando ? 'Salvar alterações' : 'Criar pedido' }}
+            </button>
+            <a class="button button-secondary" routerLink="/pedidos">Cancelar</a>
+          </div>
+        </aside>
+      </div>
+    </form>
+  }
+</section>
